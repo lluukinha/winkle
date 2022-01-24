@@ -17,10 +17,10 @@ class CreatePasswordsTable extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users');
             $table->string('name');
-            $table->string('url');
-            $table->string('username');
-            $table->string('password');
-            $table->mediumText('description');
+            $table->string('url')->nullable();
+            $table->string('login')->nullable();
+            $table->string('password')->nullable();
+            $table->mediumText('description')->nullable();
             $table->timestamps();
         });
     }

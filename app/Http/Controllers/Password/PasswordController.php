@@ -2,31 +2,39 @@
 
 namespace App\Http\Controllers\Password;
 
-use App\Exceptions\ApiExceptions\Http404;
-use App\Models\Password;
-
 use App\Http\Controllers\Controller;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+use App\Models\Password;
+
 use App\Http\Requests\Password\CreatePasswordRequest;
+use App\Http\Requests\Password\UpdatePasswordRequest;
 
 use App\Http\Resources\Password\PasswordResource;
 
+use App\Exceptions\ApiExceptions\Http404;
 use App\Exceptions\ApiExceptions\Http422;
 use App\Exceptions\Password\PasswordAlreadyExistsException;
 use App\Exceptions\Password\PasswordNotFoundException;
-use App\Http\Requests\Password\UpdatePasswordRequest;
-use Illuminate\Support\Facades\Auth;
 
 class PasswordController extends Controller
 {
     public function list() {
-        return PasswordResource::collection(Auth::user()->passwords);
+        $passwords = Auth::user()->passwords;
+        return PasswordResource::collection($passwords);
     }
 
     public function show($id) {
-        $pass = Auth::user()->passwords()->find($id);
-        return new PasswordResource($pass);
+        try {
+            $pass = Auth::user()->passwords()->find($id);
+            if (!$pass) {
+                throw new PasswordNotFoundException();
+            }
+            return new PasswordResource($pass);
+        } catch (PasswordNotFoundException $e) {
+            throw Http404::makeForField('password', 'not-found');
+        }
     }
 
     public function create(CreatePasswordRequest $request) {

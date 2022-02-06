@@ -95,6 +95,7 @@ class PasswordController extends Controller
                 throw new PasswordNotFoundException();
             }
             $pass->delete();
+            return true;
         } catch (PasswordNotFoundException $e) {
             throw Http404::makeForField('password', 'not-found');
         }

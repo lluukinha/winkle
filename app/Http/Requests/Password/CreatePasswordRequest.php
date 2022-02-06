@@ -25,10 +25,10 @@ class CreatePasswordRequest extends JSONRequest
     {
         return [
             'name' => 'required|string',
-            'url' => 'string',
-            'login' => 'string',
-            'password' => 'string',
-            'description' => 'string',
+            'url' => 'string|nullable',
+            'login' => 'string|nullable',
+            'password' => 'string|nullable',
+            'description' => 'string|nullable',
         ];
     }
 

@@ -24,11 +24,11 @@ class UpdatePasswordRequest extends JSONRequest
     public function rules()
     {
         return [
-            'name' => 'string',
-            'url' => 'string',
-            'login' => 'string',
-            'password' => 'string',
-            'description' => 'string',
+            'name' => 'required|string',
+            'url' => 'string|nullable',
+            'login' => 'string|nullable',
+            'password' => 'string|nullable',
+            'description' => 'string|nullable',
         ];
     }
 

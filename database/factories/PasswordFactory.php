@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 
 
@@ -21,7 +22,7 @@ class PasswordFactory extends Factory
             'name' => $this->faker->name(),
             'url' => $this->faker->domainName(),
             'login' => $this->faker->safeEmail(),
-            'password' => Str::random(10),
+            'password' => Crypt::encryptString(Str::random(10)),
             'description' => $this->faker->sentence(),
             'user_id' => User::factory()->create()->id
         ];

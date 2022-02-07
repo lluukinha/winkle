@@ -17,6 +17,7 @@ use App\Exceptions\ApiExceptions\Http404;
 use App\Exceptions\ApiExceptions\Http422;
 use App\Exceptions\Password\PasswordAlreadyExistsException;
 use App\Exceptions\Password\PasswordNotFoundException;
+use Illuminate\Support\Facades\Crypt;
 
 class PasswordController extends Controller
 {
@@ -48,7 +49,11 @@ class PasswordController extends Controller
             $pass = new Password();
             $pass->user_id = Auth::user()->id;
             foreach ($attributes as $key => $value) {
-                $pass[$key] = $value;
+                if ($key === "password") {
+                    $pass[$key] = Crypt::encryptString($value);
+                } else {
+                    $pass[$key] = $value;
+                }
             }
             $pass->save();
             return new PasswordResource($pass);
@@ -77,7 +82,11 @@ class PasswordController extends Controller
             }
 
             foreach ($attributes as $key => $value) {
-                $pass[$key] = $value;
+                if ($key === "password") {
+                    $pass[$key] = Crypt::encryptString($value);
+                } else {
+                    $pass[$key] = $value;
+                }
             }
             $pass->save();
             return new PasswordResource($pass);

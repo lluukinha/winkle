@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Password;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
@@ -27,7 +28,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Winkle',
             'url' => 'https://www.winkle.com.br',
             'login' => 'lucas.prog07@gmail.com',
-            'password' => 'password',
+            'password' => Crypt::encryptString('password'),
             'description' => 'Is about this website',
             'user_id' => 1
         ]);

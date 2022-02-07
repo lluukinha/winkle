@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Password;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Crypt;
 
 class PasswordResource extends JsonResource
 {
@@ -20,7 +21,7 @@ class PasswordResource extends JsonResource
             'name' => (string) $this->name,
             'url' => (string) $this->url,
             'login' => (string) $this->login,
-            'password' => (string) $this->password,
+            'password' => (string) Crypt::decryptString($this->password),
             'description' => (string) $this->description,
         ];
     }

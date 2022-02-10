@@ -49,11 +49,9 @@ class PasswordController extends Controller
             $pass = new Password();
             $pass->user_id = Auth::user()->id;
             foreach ($attributes as $key => $value) {
-                if ($key === "password") {
-                    $pass[$key] = Crypt::encryptString($value);
-                } else {
-                    $pass[$key] = $value;
-                }
+                $pass[$key] = $key === "password" || $key === "login"
+                    ? Crypt::encryptString($value)
+                    : $value;
             }
             $pass->save();
             return new PasswordResource($pass);
@@ -82,11 +80,9 @@ class PasswordController extends Controller
             }
 
             foreach ($attributes as $key => $value) {
-                if ($key === "password") {
-                    $pass[$key] = Crypt::encryptString($value);
-                } else {
-                    $pass[$key] = $value;
-                }
+                $pass[$key] = $key === "password" || $key === "login"
+                    ? Crypt::encryptString($value)
+                    : $value;
             }
             $pass->save();
             return new PasswordResource($pass);

@@ -20,9 +20,10 @@ class PasswordResource extends JsonResource
             'id' => (string) $this->id,
             'name' => (string) $this->name,
             'url' => (string) $this->url,
-            'login' => (string) $this->login,
+            'login' => (string) Crypt::decryptString($this->login),
             'password' => (string) Crypt::decryptString($this->password),
             'description' => (string) $this->description,
+            'lastUpdate' => (string) $this->updated_at
         ];
     }
 }

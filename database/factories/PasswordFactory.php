@@ -21,7 +21,7 @@ class PasswordFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'url' => $this->faker->domainName(),
-            'login' => $this->faker->safeEmail(),
+            'login' => Crypt::encryptString($this->faker->safeEmail()),
             'password' => Crypt::encryptString(Str::random(10)),
             'description' => $this->faker->sentence(),
             'user_id' => User::factory()->create()->id

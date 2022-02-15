@@ -27,8 +27,8 @@ class DatabaseSeeder extends Seeder
         Password::create([
             'name' => 'Winkle',
             'url' => 'https://www.winkle.com.br',
-            'login' => Crypt::encryptString('login'),
-            'password' => Crypt::encryptString('password'),
+            // 'login' => Crypt::encryptString('login'),
+            // 'password' => Crypt::encryptString('password'),
             'description' => 'Is about this website',
             'user_id' => 1
         ]);

@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Password;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +19,7 @@ class DatabaseSeeder extends Seeder
     {
         Schema::disableForeignKeyConstraints();
 
+        DB::table('folders')->truncate();
         DB::table('passwords')->truncate();
         DB::table('users')->truncate();
 
@@ -61,13 +61,21 @@ class DatabaseSeeder extends Seeder
             ]
         ]);
 
+        DB::table('folders')->insert([
+            [
+                'id' => 1,
+                'name' => 'Redes Sociais',
+                'user_id' => 1,
+                'model' => 'passwords'
+            ]
+        ]);
+
         Password::create([
             'name' => 'Winkle',
             'url' => 'https://www.winkle.com.br',
-            // 'login' => Crypt::encryptString('login'),
-            // 'password' => Crypt::encryptString('password'),
             'description' => 'Is about this website',
-            'user_id' => 1
+            'user_id' => 1,
+            'folder_id' => 1
         ]);
 
         Schema::enableForeignKeyConstraints();

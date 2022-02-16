@@ -26,7 +26,8 @@ class PasswordFactory extends Factory
             // 'login' => Crypt::encryptString($this->faker->safeEmail()),
             // 'password' => Crypt::encryptString(Str::random(10)),
             'description' => $this->faker->sentence(),
-            'user_id' => User::factory()->create()->id
+            'user_id' => User::factory()->create()->id,
+            'folder_id' => null
         ];
     }
 }

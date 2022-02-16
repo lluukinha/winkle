@@ -22,6 +22,7 @@ class PasswordResource extends JsonResource
             'url' => (string) $this->url,
             'login' => (string) $this->login ? Crypt::decryptString($this->login) : '',
             'password' => (string) $this->password ? Crypt::decryptString($this->password) : '',
+            'folderId' => (string) $this->folder_id,
             'description' => (string) $this->description,
             'lastUpdate' => (string) $this->updated_at
         ];

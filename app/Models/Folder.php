@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Password extends Model
+class Folder extends Model
 {
     use HasFactory;
 
@@ -13,7 +13,7 @@ class Password extends Model
         return $this->hasOne(User::class);
     }
 
-    public function folder() {
-        return $this->hasOne(Folder::class);
+    public function passwords() {
+        return $this->hasMany(Password::class);
     }
 }

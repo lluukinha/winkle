@@ -5,8 +5,9 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Password;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,44 +18,47 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        User::create([
-            'id' => 1,
-            'name' => 'Lucas Souza',
-            'email' => 'lucas@winkle.app',
-            'password' => Hash::make('password'),
-            'master_password' => md5('password')
-        ]);
+        Schema::disableForeignKeyConstraints();
 
-        User::create([
-            'id' => 2,
-            'name' => 'Ayla Souza',
-            'email' => 'ayla@winkle.app',
-            'password' => Hash::make('password'),
-            'master_password' => md5('password')
-        ]);
+        DB::table('passwords')->truncate();
+        DB::table('users')->truncate();
 
-        User::create([
-            'id' => 3,
-            'name' => 'Lauro Yoshimoto',
-            'email' => 'lauro@winkle.app',
-            'password' => Hash::make('password'),
-            'master_password' => md5('password')
-        ]);
-
-        User::create([
-            'id' => 4,
-            'name' => 'Renan Junior',
-            'email' => 'renan@winkle.app',
-            'password' => Hash::make('password'),
-            'master_password' => md5('password')
-        ]);
-
-        User::create([
-            'id' => 5,
-            'name' => 'Victor Heid Kunamitsu Miko',
-            'email' => 'victor@winkle.app',
-            'password' => Hash::make('password'),
-            'master_password' => md5('password')
+        DB::table('users')->insert([
+            [
+                'id' => 1,
+                'name' => 'Lucas Souza',
+                'email' => 'lucas@winkle.app',
+                'password' => Hash::make('password'),
+                'master_password' => Hash::make('password')
+            ],
+            [
+                'id' => 2,
+                'name' => 'Ayla Souza',
+                'email' => 'ayla@winkle.app',
+                'password' => Hash::make('password'),
+                'master_password' => Hash::make('password')
+            ],
+            [
+                'id' => 3,
+                'name' => 'Lauro Yoshimoto',
+                'email' => 'lauro@winkle.app',
+                'password' => Hash::make('password'),
+                'master_password' => Hash::make('password')
+            ],
+            [
+                'id' => 4,
+                'name' => 'Renan Junior',
+                'email' => 'renan@winkle.app',
+                'password' => Hash::make('password'),
+                'master_password' => Hash::make('password')
+            ],
+            [
+                'id' => 5,
+                'name' => 'Victor Heid Kunamitsu Miko',
+                'email' => 'victor@winkle.app',
+                'password' => Hash::make('password'),
+                'master_password' => Hash::make('password')
+            ]
         ]);
 
         Password::create([
@@ -65,5 +69,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Is about this website',
             'user_id' => 1
         ]);
+
+        Schema::enableForeignKeyConstraints();
     }
 }

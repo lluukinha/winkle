@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -36,8 +37,8 @@ class AuthController extends Controller
     public function checkMasterPassword()
     {
         $masterPassword = request('master');
-        $response = false;
-        if (Auth::user()->master_password == md5($masterPassword)) $response = true;
+        $userMasterPassword = Auth::user()->master_password;
+        $response = Hash::check($masterPassword, $userMasterPassword);
         return response()->json($response);
     }
 

@@ -20,8 +20,41 @@ class DatabaseSeeder extends Seeder
         User::create([
             'id' => 1,
             'name' => 'Lucas Souza',
-            'email' => 'lucas.prog07@gmail.com',
-            'password' => Hash::make('password')
+            'email' => 'lucas@winkle.app',
+            'password' => Hash::make('password'),
+            'master_password' => md5('password')
+        ]);
+
+        User::create([
+            'id' => 2,
+            'name' => 'Ayla Souza',
+            'email' => 'ayla@winkle.app',
+            'password' => Hash::make('password'),
+            'master_password' => md5('password')
+        ]);
+
+        User::create([
+            'id' => 3,
+            'name' => 'Lauro Yoshimoto',
+            'email' => 'lauro@winkle.app',
+            'password' => Hash::make('password'),
+            'master_password' => md5('password')
+        ]);
+
+        User::create([
+            'id' => 4,
+            'name' => 'Renan Junior',
+            'email' => 'renan@winkle.app',
+            'password' => Hash::make('password'),
+            'master_password' => md5('password')
+        ]);
+
+        User::create([
+            'id' => 5,
+            'name' => 'Victor Heid Kunamitsu Miko',
+            'email' => 'victor@winkle.app',
+            'password' => Hash::make('password'),
+            'master_password' => md5('password')
         ]);
 
         Password::create([

@@ -23,6 +23,7 @@ Route::middleware('auth')->group(function($router) {
     Route::group(['prefix' => 'auth'], function($router) {
         Route::post('logout', [AuthController::class, 'logout']);
         Route::post('refresh', [AuthController::class, 'refresh']);
+        Route::post('checkMasterPassword', [AuthController::class, 'checkMasterPassword']);
         Route::get('me', [AuthController::class, 'me']);
     });
 

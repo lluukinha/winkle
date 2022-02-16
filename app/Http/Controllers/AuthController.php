@@ -33,6 +33,14 @@ class AuthController extends Controller
         return $this->respondWithToken($token);
     }
 
+    public function checkMasterPassword()
+    {
+        $masterPassword = request('master');
+        $response = false;
+        if (Auth::user()->master_password == md5($masterPassword)) $response = true;
+        return response()->json($response);
+    }
+
     /**
      * Get the authenticated User.
      *

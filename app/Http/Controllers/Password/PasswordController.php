@@ -118,16 +118,9 @@ class PasswordController extends Controller
 
             if (array_key_exists("folder", $attributes)) {
                 $willRemoveCurrentFolder = false;
-                $currentFolder = $pass->folder();
+                $currentFolder = $pass->folder;
                 $folder = $attributes["folder"];
-                if (is_null($folder["id"])) {
-                    if ($currentFolder) {
-                        $counterPasswordsForCurrentFolder = $currentFolder->passwords->count();
-                        if ($counterPasswordsForCurrentFolder < 2) {
-                            $willRemoveCurrentFolder = true;
-                        }
-                    }
-
+                if (is_null($folder["id"]) || $folder["id"] == "") {
                     $f = new Folder();
                     $f->user_id = Auth::user()->id;
                     $f->model = "passwords";
@@ -140,14 +133,18 @@ class PasswordController extends Controller
                     }
                 }
 
+                if ($currentFolder && $currentFolder->passwords->count() < 2) {
+                    $willRemoveCurrentFolder = true;
+                }
+
                 $pass->folder_id = $f->id;
+                $pass->save();
 
                 if ($willRemoveCurrentFolder) {
-                    $currentFolder->remove();
+                    $folderToRemove = Folder::find($currentFolder->id);
+                    $folderToRemove->delete();
                 }
             }
-
-            $pass->save();
             return new PasswordResource($pass);
         } catch (PasswordAlreadyExistsException $e) {
             throw Http422::makeForField('password', 'already-exists');
@@ -164,7 +161,17 @@ class PasswordController extends Controller
             if (!$pass) {
                 throw new PasswordNotFoundException();
             }
+
+            $willDeleteFolder= false;
+            $folder = $pass->folder;
+
+            if ($folder && $folder->passwords->count() < 2) {
+                $willDeleteFolder = true;
+            }
+
             $pass->delete();
+            $folder->delete();
+
             return true;
         } catch (PasswordNotFoundException $e) {
             throw Http404::makeForField('password', 'not-found');

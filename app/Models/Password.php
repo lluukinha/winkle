@@ -14,6 +14,6 @@ class Password extends Model
     }
 
     public function folder() {
-        return $this->hasOne(Folder::class);
+        return $this->belongsTo(Folder::class);
     }
 }

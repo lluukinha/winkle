@@ -170,7 +170,9 @@ class PasswordController extends Controller
             }
 
             $pass->delete();
-            $folder->delete();
+            if ($willDeleteFolder) {
+                $folder->delete();
+            }
 
             return true;
         } catch (PasswordNotFoundException $e) {

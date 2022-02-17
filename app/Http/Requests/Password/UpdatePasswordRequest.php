@@ -31,7 +31,7 @@ class UpdatePasswordRequest extends JSONRequest
             'description' => 'string|nullable',
             'folder' => 'array|nullable',
             'folder.id' => 'string|nullable',
-            'folder.name' => 'string'
+            'folder.name' => 'string|nullable'
         ];
     }
 

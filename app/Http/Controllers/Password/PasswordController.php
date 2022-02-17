@@ -20,6 +20,7 @@ use App\Exceptions\Password\PasswordAlreadyExistsException;
 use App\Exceptions\Password\PasswordNotFoundException;
 use App\Http\Resources\Password\PasswordFolderResource;
 use App\Models\Folder;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Crypt;
 
 class PasswordController extends Controller
@@ -63,7 +64,7 @@ class PasswordController extends Controller
                     : $value;
             }
 
-            if (array_key_exists("folder", $attributes)) {
+            if (array_key_exists("folder", $attributes) && $attributes["folder"]["name"] != "") {
                 $folder = $attributes["folder"];
                 if (is_null($folder["id"])) {
                     $f = new Folder();
@@ -117,34 +118,54 @@ class PasswordController extends Controller
             }
 
             if (array_key_exists("folder", $attributes)) {
+                $willUpdate = false;
                 $willRemoveCurrentFolder = false;
                 $currentFolder = $pass->folder;
                 $folder = $attributes["folder"];
-                if (is_null($folder["id"]) || $folder["id"] == "") {
-                    $f = new Folder();
-                    $f->user_id = Auth::user()->id;
-                    $f->model = "passwords";
-                    $f->name = $folder["name"];
-                    $f->save();
-                } else {
-                    $f = Folder::find($folder["id"]);
-                    if (!$f) {
-                        throw new FolderNotFoundException();
+                $willRemoveFolderFromPassword = false;
+                $f = null;
+
+                if (is_null($folder["id"]) && is_null($folder["name"]) && !is_null($currentFolder)) {
+                    $willRemoveFolderFromPassword = true;
+                }
+
+                if (!is_null($folder["name"]) || !is_null($folder["id"])) {
+                    if (is_null($folder["id"])) {
+                        $existingFolder = Auth::user()->folders->where('name', $folder["name"])->first();
+                        if ($existingFolder) {
+                            $f = $existingFolder;
+                        } else {
+                            $f = new Folder();
+                            $f->user_id = Auth::user()->id;
+                            $f->model = "passwords";
+                            $f->name = strtoupper($folder["name"]);
+                            $f->save();
+                        }
+                    } else {
+                        $f = Auth::user()->folders->find($folder["id"]);
+                        if (!$f) {
+                            throw new FolderNotFoundException();
+                        }
+                    }
+                    $willUpdate = true;
+                }
+
+                if ($willUpdate || $willRemoveFolderFromPassword) {
+                    $pass->folder_id = is_null($f) ? null : $f->id;
+
+                    if ($currentFolder && $currentFolder->passwords->count() < 2) {
+                        $willRemoveCurrentFolder = true;
                     }
                 }
 
-                if ($currentFolder && $currentFolder->passwords->count() < 2) {
-                    $willRemoveCurrentFolder = true;
-                }
-
-                $pass->folder_id = $f->id;
                 $pass->save();
+                $pass = $pass->fresh();
 
                 if ($willRemoveCurrentFolder) {
-                    $folderToRemove = Folder::find($currentFolder->id);
-                    $folderToRemove->delete();
+                    $currentFolder->delete();
                 }
             }
+
             return new PasswordResource($pass);
         } catch (PasswordAlreadyExistsException $e) {
             throw Http422::makeForField('password', 'already-exists');

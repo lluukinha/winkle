@@ -15,7 +15,6 @@ class PasswordFolderResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'type' => 'password_folders',
             'id' => (string) $this->id,
             'name' => (string) $this->name,
         ];

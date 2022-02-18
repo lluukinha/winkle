@@ -13,6 +13,7 @@ class ExampleTest extends TestCase
      */
     public function test_example()
     {
+        $this->markTestSkipped('example test.');
         $this->assertTrue(true);
     }
 }

@@ -28,17 +28,42 @@ class PasswordSuccessTest extends TestCase
             ]);
     }
 
-    public function testShowPassword() {
+    public function testCreatePassword() {
         $user = User::factory()->create();
-        $pass = Password::factory()->create([ 'user_id' => $user->id ]);
 
-        $response = $this->actingAs($user)->getJson("/api/passwords/$pass->id");
+        $data = [
+            "name" => "Quindim do Marcos",
+            "url" => "https://www.teste.com.br"
+        ];
+
+        $response = $this->actingAs($user)->postJson("/api/passwords", $data);
+        $response
+            ->assertStatus(201)
+            ->assertJson([
+                'data' => [
+                    "name" => $data["name"],
+                    "url" => $data["url"]
+                ]
+            ]);
+    }
+
+    public function testUpdatePassword() {
+        $user = User::factory()->create();
+        $password = Password::factory()
+            ->create(['user_id' => $user->id]);
+
+        $data = [
+            "name" => $password->name,
+            "url" => "https://www.teste.com.br"
+        ];
+
+        $response = $this->actingAs($user)
+            ->putJson("/api/passwords/$password->id", $data);
         $response
             ->assertStatus(200)
             ->assertJson([
                 'data' => [
-                    'type' => 'passwords',
-                    'id' => (string) $pass->id,
+                    "url" => $data["url"]
                 ]
             ]);
     }

@@ -15,7 +15,6 @@ class PasswordFolderSuccessTest extends TestCase
     public function testListPasswords() {
         $user = User::factory()->create();
         $folder = Folder::factory()->create([ 'user_id' => $user->id, 'model' => 'passwords' ]);
-        // $pass = Password::factory()->create([ 'user_id' => $user->id, 'folder_id' => $folder->id ]);
 
         $response = $this->actingAs($user)->getJson("/api/passwords/folders");
         $response
@@ -23,7 +22,6 @@ class PasswordFolderSuccessTest extends TestCase
             ->assertJson([
                 'data' => [
                     [
-                        'type' => 'password_folders',
                         'id' => (string) $folder->id,
                         'name' => (string) $folder->name,
                     ]

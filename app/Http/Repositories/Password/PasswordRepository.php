@@ -137,4 +137,4 @@ class PasswordRepository {
 
         return $model;
     }
-};
+}

@@ -70,4 +70,13 @@ class User extends Authenticatable implements JWTSubject
     public function folders() {
         return $this->hasMany(Folder::class);
     }
+
+    public function canUpdateMasterPassword() {
+        $passwordsCount = $this->passwords()
+            ->whereNotNull('login')
+            ->orWhereNotNull('password')
+            ->count();
+
+        return $passwordsCount == 0;
+    }
 }

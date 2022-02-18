@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Auth;
 
-use App\Models\Password;
-
 use App\Http\Requests\Password\CreatePasswordRequest;
 use App\Http\Requests\Password\UpdatePasswordRequest;
 
@@ -22,10 +20,6 @@ use App\Exceptions\Password\PasswordNotFoundException;
 use App\Http\Models\Password\PasswordModel;
 use App\Http\Repositories\Password\PasswordRepository;
 use App\Http\Resources\Password\PasswordFolderResource;
-use App\Models\Folder;
-use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Crypt;
 
 class PasswordController extends Controller
 {

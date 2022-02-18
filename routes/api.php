@@ -1,8 +1,10 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Password\PasswordController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\User\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,5 +35,13 @@ Route::middleware('auth')->group(function($router) {
         Route::post('/', [PasswordController::class, 'create']);
         Route::put('/{id}', [PasswordController::class, 'update']);
         Route::delete('/{id}', [PasswordController::class, 'delete']);
+    });
+
+    Route::group(['prefix' => 'user'], function($router) {
+        Route::get('/', [UserController::class, 'show']);
+        // Route::put('/', [UserController::class, 'update']);
+        Route::put('/email', [UserController::class, 'updateEmail']);
+        Route::put('/password', [UserController::class, 'updatePassword']);
+        Route::put('/masterPassword', [UserController::class, 'updateMasterPassword']);
     });
 });

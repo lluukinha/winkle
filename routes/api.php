@@ -29,10 +29,8 @@ Route::middleware('auth')->group(function($router) {
 
     Route::group(['prefix' => 'passwords'], function($router) {
         Route::get('/folders', [PasswordController::class, 'listFolders']);
-
         Route::get('/', [PasswordController::class, 'list']);
         Route::post('/', [PasswordController::class, 'create']);
-        Route::get('/{id}', [PasswordController::class, 'show']);
         Route::put('/{id}', [PasswordController::class, 'update']);
         Route::delete('/{id}', [PasswordController::class, 'delete']);
     });

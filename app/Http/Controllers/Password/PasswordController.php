@@ -15,11 +15,15 @@ use App\Http\Resources\Password\PasswordResource;
 
 use App\Exceptions\ApiExceptions\Http404;
 use App\Exceptions\ApiExceptions\Http422;
+use App\Exceptions\Password\FolderHasPasswordsException;
 use App\Exceptions\Password\FolderNotFoundException;
 use App\Exceptions\Password\PasswordAlreadyExistsException;
 use App\Exceptions\Password\PasswordNotFoundException;
+use App\Http\Models\Password\PasswordModel;
+use App\Http\Repositories\Password\PasswordRepository;
 use App\Http\Resources\Password\PasswordFolderResource;
 use App\Models\Folder;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Crypt;
 
@@ -35,55 +39,25 @@ class PasswordController extends Controller
         return PasswordFolderResource::collection($folders);
     }
 
-    public function show($id) {
-        try {
-            $pass = Auth::user()->passwords()->find($id);
-            if (!$pass) {
-                throw new PasswordNotFoundException();
-            }
-            return new PasswordResource($pass);
-        } catch (PasswordNotFoundException $e) {
-            throw Http404::makeForField('password', 'not-found');
-        }
+    private function retrieveModel($attributes) : PasswordModel {
+        return new PasswordModel(
+            $attributes["name"],
+            $attributes["url"] ?? null,
+            $attributes["login"] ?? null,
+            $attributes["password"] ?? null,
+            $attributes["description"] ?? null,
+            $attributes["folder"]["id"] ?? null,
+            $attributes["folder"]["name"] ?? null,
+        );
     }
 
     public function create(CreatePasswordRequest $request) {
         try {
             $attributes = $request->validated();
-            $passwordAlreadyExists = Auth::user()->passwords()->where('name', $attributes['name'])->exists();
-            if ($passwordAlreadyExists) {
-                throw new PasswordAlreadyExistsException();
-            }
-
-            $pass = new Password();
-            $pass->user_id = Auth::user()->id;
-            foreach ($attributes as $key => $value) {
-                if ($key == "folder") continue;
-                $pass[$key] = $key === "password" || $key === "login"
-                    ? Crypt::encryptString($value)
-                    : $value;
-            }
-
-            if (array_key_exists("folder", $attributes) && $attributes["folder"]["name"] != "") {
-                $folder = $attributes["folder"];
-                if (is_null($folder["id"])) {
-                    $f = new Folder();
-                    $f->user_id = Auth::user()->id;
-                    $f->model = "passwords";
-                    $f->name = $folder["name"];
-                    $f->save();
-                } else {
-                    $f = Folder::find($folder["id"]);
-                    if (!$f) {
-                        throw new FolderNotFoundException();
-                    }
-                }
-
-                $pass->folder_id = $f->id;
-            }
-
-            $pass->save();
-            return new PasswordResource($pass);
+            $passwordModel = $this->retrieveModel($attributes);
+            $repository = new PasswordRepository();
+            $password = $repository->create($passwordModel);
+            return new PasswordResource($password);
         } catch (PasswordAlreadyExistsException $e) {
             throw Http422::makeForField('name', 'already-exists');
         } catch (FolderNotFoundException $e) {
@@ -93,108 +67,27 @@ class PasswordController extends Controller
 
     public function update(UpdatePasswordRequest $request, $id) {
         try {
-            $pass = Auth::user()->passwords()->find($id);
-            if (!$pass) {
-                throw new PasswordNotFoundException();
-            }
-
             $attributes = $request->validated();
-            if (array_key_exists('name', $attributes)) {
-                $passwordAlreadyExists = Auth::user()->passwords()
-                    ->where('id', '<>', $id)
-                    ->where('name', $attributes['name'])
-                    ->exists();
-
-                if ($passwordAlreadyExists) {
-                    throw new PasswordAlreadyExistsException();
-                }
-            }
-
-            foreach ($attributes as $key => $value) {
-                if ($key == "folder") continue;
-                $pass[$key] = $key === "password" || $key === "login"
-                    ? Crypt::encryptString($value)
-                    : $value;
-            }
-
-            if (array_key_exists("folder", $attributes)) {
-                $willUpdate = false;
-                $willRemoveCurrentFolder = false;
-                $currentFolder = $pass->folder;
-                $folder = $attributes["folder"];
-                $willRemoveFolderFromPassword = false;
-                $f = null;
-
-                if (is_null($folder["id"]) && is_null($folder["name"]) && !is_null($currentFolder)) {
-                    $willRemoveFolderFromPassword = true;
-                }
-
-                if (!is_null($folder["name"]) || !is_null($folder["id"])) {
-                    if (is_null($folder["id"])) {
-                        $existingFolder = Auth::user()->folders->where('name', $folder["name"])->first();
-                        if ($existingFolder) {
-                            $f = $existingFolder;
-                        } else {
-                            $f = new Folder();
-                            $f->user_id = Auth::user()->id;
-                            $f->model = "passwords";
-                            $f->name = strtoupper($folder["name"]);
-                            $f->save();
-                        }
-                    } else {
-                        $f = Auth::user()->folders->find($folder["id"]);
-                        if (!$f) {
-                            throw new FolderNotFoundException();
-                        }
-                    }
-                    $willUpdate = true;
-                }
-
-                if ($willUpdate || $willRemoveFolderFromPassword) {
-                    $pass->folder_id = is_null($f) ? null : $f->id;
-
-                    if ($currentFolder && $currentFolder->passwords->count() < 2) {
-                        $willRemoveCurrentFolder = true;
-                    }
-                }
-
-                $pass->save();
-                $pass = $pass->fresh();
-
-                if ($willRemoveCurrentFolder) {
-                    $currentFolder->delete();
-                }
-            }
-
-            return new PasswordResource($pass);
+            $passwordModel = $this->retrieveModel($attributes);
+            $passwordModel->setId($id);
+            $repository = new PasswordRepository();
+            $password = $repository->update($passwordModel);
+            return new PasswordResource($password);
         } catch (PasswordAlreadyExistsException $e) {
             throw Http422::makeForField('password', 'already-exists');
         } catch (PasswordNotFoundException $e) {
             throw Http404::makeForField('password', 'not-found');
         } catch (FolderNotFoundException $e) {
             throw Http404::makeForField('folder', 'not-found');
+        } catch (FolderHasPasswordsException $e) {
+            throw Http422::makeForField('folder', 'has-passwords');
         }
     }
 
     public function delete($id) {
         try {
-            $pass = Auth::user()->passwords()->find($id);
-            if (!$pass) {
-                throw new PasswordNotFoundException();
-            }
-
-            $willDeleteFolder= false;
-            $folder = $pass->folder;
-
-            if ($folder && $folder->passwords->count() < 2) {
-                $willDeleteFolder = true;
-            }
-
-            $pass->delete();
-            if ($willDeleteFolder) {
-                $folder->delete();
-            }
-
+            $repository = new PasswordRepository();
+            $repository->delete($id);
             return true;
         } catch (PasswordNotFoundException $e) {
             throw Http404::makeForField('password', 'not-found');

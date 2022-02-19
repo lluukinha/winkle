@@ -12,6 +12,7 @@ use App\Exceptions\User\UserInvalidPasswordException;
 use App\Exceptions\User\UserNotFoundException;
 use App\Exceptions\User\UserOldPasswordIsIncorrectException;
 use App\Exceptions\User\UserPasswordDidNotChangeException;
+use App\Exceptions\User\UserPasswordDoesNotMatchException;
 use App\Http\Models\Password\PasswordModel;
 use App\Models\Folder;
 use App\Models\Password;
@@ -44,15 +45,18 @@ class UserRepository {
         return $user;
     }
 
-    public function updatePassword(string $oldPassword, string $newPassword) : User {
+    public function updatePassword(string $password, string $newPassword, string $confirmNewPassword) : User {
         $user = $this->getLoggedInUser();
-        $currentPassword = $user->password;
 
-        if (!Hash::check($oldPassword, $currentPassword)) {
+        if (!Hash::check($password, $user->password)) {
             throw new UserOldPasswordIsIncorrectException();
         }
 
-        if (Hash::check($newPassword, $currentPassword)) {
+        if ($newPassword !== $confirmNewPassword) {
+            throw new UserPasswordDoesNotMatchException();
+        }
+
+        if (Hash::check($newPassword, $user->password)) {
             throw new UserPasswordDidNotChangeException();
         }
 

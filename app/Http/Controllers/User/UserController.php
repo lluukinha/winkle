@@ -19,6 +19,7 @@ use App\Exceptions\User\UserInvalidPasswordException;
 use App\Exceptions\User\UserNotFoundException;
 use App\Exceptions\User\UserOldPasswordIsIncorrectException;
 use App\Exceptions\User\UserPasswordDidNotChangeException;
+use App\Exceptions\User\UserPasswordDoesNotMatchException;
 use App\Http\Repositories\User\UserRepository;
 
 class UserController extends Controller
@@ -51,14 +52,20 @@ class UserController extends Controller
         try {
             $attributes = $request->validated();
             $repository = new UserRepository();
-            $user = $repository->updatePassword($attributes["oldPassword"], $attributes["newPassword"]);
+            $user = $repository->updatePassword(
+                $attributes["password"],
+                $attributes["newPassword"],
+                $attributes["confirmNewPassword"],
+            );
             return new UserResource($user);
         } catch (UserNotFoundException $e) {
             throw Http404::makeForField('user', 'not-found');
         } catch (UserOldPasswordIsIncorrectException $e) {
-            throw Http422::makeForField('oldPassword', 'old-password-incorrect');
+            throw Http422::makeForField('oldPassword', 'password-incorrect');
         } catch (UserPasswordDidNotChangeException $e) {
             throw Http422::makeForField('password', 'password-is-equal');
+        } catch (UserPasswordDoesNotMatchException $e) {
+            throw Http422::makeForField('password', 'password-does-not-match');
         }
     }
 
@@ -75,7 +82,7 @@ class UserController extends Controller
         } catch (UserNotFoundException $e) {
             throw Http404::makeForField('user', 'not-found');
         } catch (UserOldPasswordIsIncorrectException $e) {
-            throw Http422::makeForField('oldPassword', 'old-password-incorrect');
+            throw Http422::makeForField('oldPassword', 'master-password-incorrect');
         } catch (UserPasswordDidNotChangeException $e) {
             throw Http422::makeForField('master-password', 'password-is-equal');
         } catch (UserInvalidPasswordException $e) {

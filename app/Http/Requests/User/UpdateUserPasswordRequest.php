@@ -24,8 +24,9 @@ class UpdateUserPasswordRequest extends JSONRequest
     public function rules()
     {
         return [
-            'oldPassword' => 'required|string',
+            'password' => 'required|string',
             'newPassword' => 'required|string',
+            'confirmNewPassword' => 'required|string',
         ];
     }
 
@@ -37,10 +38,12 @@ class UpdateUserPasswordRequest extends JSONRequest
     public function messages()
     {
         return [
-            'oldPassword.required' => 'is-required',
-            'oldPassword.string' => 'must-be-string',
+            'password.required' => 'is-required',
+            'password.string' => 'must-be-string',
             'newPassword.required' => 'is-required',
             'newPassword.string' => 'must-be-string',
+            'confirmNewPassword.required' => 'is-required',
+            'confirmNewPassword.string' => 'must-be-string',
         ];
     }
 }

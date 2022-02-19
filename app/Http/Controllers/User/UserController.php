@@ -43,7 +43,7 @@ class UserController extends Controller
         } catch (UserEmailDoesNotMatchException $e) {
             throw Http422::makeForField('email', 'emails-does-not-match');
         } catch (UserInvalidPasswordException $e) {
-            throw Http422::makeForField('password', 'incorrect');
+            throw Http422::makeForField('password', 'password-incorrect');
         }
     }
 
@@ -56,7 +56,7 @@ class UserController extends Controller
         } catch (UserNotFoundException $e) {
             throw Http404::makeForField('user', 'not-found');
         } catch (UserOldPasswordIsIncorrectException $e) {
-            throw Http422::makeForField('oldPassword', 'incorrect');
+            throw Http422::makeForField('oldPassword', 'old-password-incorrect');
         } catch (UserPasswordDidNotChangeException $e) {
             throw Http422::makeForField('password', 'password-is-equal');
         }
@@ -75,11 +75,11 @@ class UserController extends Controller
         } catch (UserNotFoundException $e) {
             throw Http404::makeForField('user', 'not-found');
         } catch (UserOldPasswordIsIncorrectException $e) {
-            throw Http422::makeForField('oldPassword', 'incorrect');
+            throw Http422::makeForField('oldPassword', 'old-password-incorrect');
         } catch (UserPasswordDidNotChangeException $e) {
             throw Http422::makeForField('master-password', 'password-is-equal');
         } catch (UserInvalidPasswordException $e) {
-            throw Http422::makeForField('password', 'incorrect');
+            throw Http422::makeForField('password', 'password-incorrect');
         } catch (UserHasEncryptedDataException $e) {
             throw Http422::makeForField('master-password', 'has-encrypted-data');
         }

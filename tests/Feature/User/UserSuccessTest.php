@@ -4,6 +4,7 @@ namespace Tests\Feature\User;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class UserSuccessTest extends TestCase
@@ -27,8 +28,13 @@ class UserSuccessTest extends TestCase
     }
 
     public function testUpdateUserEmail() {
-        $user = User::factory()->create();
-        $data = [ "email" => "marcolino@gmail.com" ];
+        $user = User::factory()
+            ->create([ "password" => Hash::make("currentPass") ]);
+        $data = [
+            "email" => "marcolino@gmail.com",
+            "confirmEmail" => "marcolino@gmail.com",
+            "password" => "currentPass"
+        ];
         $response = $this->actingAs($user)
             ->putJson("/api/user/email", $data);
 

@@ -13,6 +13,7 @@ use App\Http\Requests\User\UpdateUserPasswordRequest;
 
 use App\Exceptions\ApiExceptions\Http404;
 use App\Exceptions\ApiExceptions\Http422;
+use App\Exceptions\User\UserEmailDoesNotMatchException;
 use App\Exceptions\User\UserHasEncryptedDataException;
 use App\Exceptions\User\UserInvalidPasswordException;
 use App\Exceptions\User\UserNotFoundException;
@@ -31,10 +32,18 @@ class UserController extends Controller
         try {
             $attributes = $request->validated();
             $repository = new UserRepository();
-            $user = $repository->updateEmail($attributes["email"]);
+            $user = $repository->updateEmail(
+                $attributes["email"],
+                $attributes["confirmEmail"],
+                $attributes["password"]
+            );
             return new UserResource($user);
         } catch (UserNotFoundException $e) {
             throw Http404::makeForField('user', 'not-found');
+        } catch (UserEmailDoesNotMatchException $e) {
+            throw Http422::makeForField('email', 'emails-does-not-match');
+        } catch (UserInvalidPasswordException $e) {
+            throw Http422::makeForField('password', 'incorrect');
         }
     }
 

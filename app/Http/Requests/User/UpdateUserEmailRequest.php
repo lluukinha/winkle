@@ -25,6 +25,8 @@ class UpdateUserEmailRequest extends JSONRequest
     {
         return [
             'email' => 'required|email',
+            'confirmEmail' => 'required|email',
+            'password' => 'required|string',
         ];
     }
 
@@ -38,6 +40,10 @@ class UpdateUserEmailRequest extends JSONRequest
         return [
             'email.required' => 'is-required',
             'email.email' => 'must-be-email',
+            'confirmEmail.required' => 'is-required',
+            'confirmEmail.email' => 'must-be-email',
+            'password.required' => 'is-required',
+            'password.string' => 'is-empty'
         ];
     }
 }

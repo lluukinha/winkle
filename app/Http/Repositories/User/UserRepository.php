@@ -6,6 +6,7 @@ use App\Exceptions\Password\FolderHasPasswordsException;
 use App\Exceptions\Password\FolderNotFoundException;
 use App\Exceptions\Password\PasswordAlreadyExistsException;
 use App\Exceptions\Password\PasswordNotFoundException;
+use App\Exceptions\User\UserEmailDoesNotMatchException;
 use App\Exceptions\User\UserHasEncryptedDataException;
 use App\Exceptions\User\UserInvalidPasswordException;
 use App\Exceptions\User\UserNotFoundException;
@@ -27,9 +28,18 @@ class UserRepository {
         return $user;
     }
 
-    public function updateEmail(string $newEmail) : User {
+    public function updateEmail(string $email, string $confirmEmail, string $password) : User {
         $user = $this->getLoggedInUser();
-        $user->email = $newEmail;
+
+        if (!Hash::check($password, $user->password)) {
+            throw new UserInvalidPasswordException();
+        }
+
+        if ($email != $confirmEmail) {
+            throw new UserEmailDoesNotMatchException();
+        }
+
+        $user->email = $email;
         $user->save();
         return $user;
     }

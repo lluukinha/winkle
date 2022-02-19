@@ -29,6 +29,29 @@ class UserErrorTest extends TestCase
             ]);
     }
 
+    public function testUpdateUserEmailUsingWrongPassword() {
+        $user = User::factory()->create();
+        $data = [
+            "email" => "marcolino@teste.com",
+            "confirmEmail" => "marcolino@teste.com",
+            "password" => "Incorrect" // correct is password
+        ];
+
+        $response = $this->actingAs($user)
+            ->putJson("/api/user/email", $data);
+
+        $response
+            ->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    [
+                        "title" => "incorrect",
+                        "source" => [ "parameter" => "password" ]
+                    ]
+                ]
+            ]);
+    }
+
     public function testUpdateUserPasswordSendingWrongPassword() {
         $user = User::factory()->create();
         $data = [

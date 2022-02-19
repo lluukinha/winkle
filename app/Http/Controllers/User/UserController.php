@@ -76,7 +76,8 @@ class UserController extends Controller
             $user = $repository->updateMasterPassword(
                 $attributes["password"],
                 $attributes["oldMasterPassword"],
-                $attributes["newMasterPassword"]
+                $attributes["newMasterPassword"],
+                $attributes["confirmNewMasterPassword"]
             );
             return new UserResource($user);
         } catch (UserNotFoundException $e) {

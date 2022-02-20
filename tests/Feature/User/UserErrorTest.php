@@ -45,7 +45,7 @@ class UserErrorTest extends TestCase
             ->assertJson([
                 'errors' => [
                     [
-                        "title" => "incorrect",
+                        "title" => "password-incorrect",
                         "source" => [ "parameter" => "password" ]
                     ]
                 ]
@@ -55,8 +55,9 @@ class UserErrorTest extends TestCase
     public function testUpdateUserPasswordSendingWrongPassword() {
         $user = User::factory()->create();
         $data = [
-            "oldPassword" => "oldPassword", // correct is password
+            "password" => "oldPassword", // correct is password
             "newPassword" => "lucasPass",
+            "confirmNewPassword" => "lucasPass",
         ];
 
         $response = $this->actingAs($user)
@@ -67,7 +68,7 @@ class UserErrorTest extends TestCase
             ->assertJson([
                 'errors' => [
                     [
-                        "title" => "incorrect",
+                        "title" => "password-incorrect",
                         "source" => [ "parameter" => "oldPassword"]
                     ]
                 ]
@@ -80,6 +81,7 @@ class UserErrorTest extends TestCase
             "password" => "wrongPassword", // correct is password
             "oldMasterPassword" => "password",
             "newMasterPassword" => "lucasPass",
+            "confirmNewMasterPassword" => "lucasPass",
         ];
 
         $response = $this->actingAs($user)
@@ -90,7 +92,7 @@ class UserErrorTest extends TestCase
             ->assertJson([
                 'errors' => [
                     [
-                        "title" => "incorrect",
+                        "title" => "password-incorrect",
                         "source" => [ "parameter" => "password"]
                     ]
                 ]
@@ -109,6 +111,7 @@ class UserErrorTest extends TestCase
             "password" => "password",
             "oldMasterPassword" => "password",
             "newMasterPassword" => "lucasPass",
+            "confirmNewMasterPassword" => "lucasPass",
         ];
 
         $response = $this->actingAs($user)

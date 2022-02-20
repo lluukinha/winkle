@@ -53,8 +53,9 @@ class UserSuccessTest extends TestCase
     public function testUpdateUserPassword() {
         $user = User::factory()->create();
         $data = [
-            "oldPassword" => "password",
+            "password" => "password",
             "newPassword" => "lucasPass",
+            "confirmNewPassword" => "lucasPass",
         ];
 
         $response = $this->actingAs($user)
@@ -76,6 +77,7 @@ class UserSuccessTest extends TestCase
             "password" => "password",
             "oldMasterPassword" => "password",
             "newMasterPassword" => "lucasPass",
+            "confirmNewMasterPassword" => "lucasPass",
         ];
 
         $response = $this->actingAs($user)

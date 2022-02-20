@@ -2,10 +2,6 @@
 
 namespace App\Http\Repositories\User;
 
-use App\Exceptions\Password\FolderHasPasswordsException;
-use App\Exceptions\Password\FolderNotFoundException;
-use App\Exceptions\Password\PasswordAlreadyExistsException;
-use App\Exceptions\Password\PasswordNotFoundException;
 use App\Exceptions\User\UserEmailDoesNotMatchException;
 use App\Exceptions\User\UserHasEncryptedDataException;
 use App\Exceptions\User\UserInvalidPasswordException;
@@ -13,10 +9,9 @@ use App\Exceptions\User\UserNotFoundException;
 use App\Exceptions\User\UserOldPasswordIsIncorrectException;
 use App\Exceptions\User\UserPasswordDidNotChangeException;
 use App\Exceptions\User\UserPasswordDoesNotMatchException;
-use App\Http\Models\Password\PasswordModel;
-use App\Models\Folder;
-use App\Models\Password;
+
 use App\Models\User;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 

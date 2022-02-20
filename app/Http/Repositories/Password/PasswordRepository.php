@@ -2,7 +2,6 @@
 
 namespace App\Http\Repositories\Password;
 
-use App\Exceptions\Password\FolderHasPasswordsException;
 use App\Exceptions\Password\FolderNotFoundException;
 use App\Exceptions\Password\PasswordAlreadyExistsException;
 use App\Exceptions\Password\PasswordNotFoundException;

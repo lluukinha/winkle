@@ -128,4 +128,51 @@ class UserErrorTest extends TestCase
                 ]
             ]);
     }
+
+    public function testUpdateUserPasswordUsingSmallerNewPassword() {
+        $user = User::factory()->create();
+        $data = [
+            "password" => "password",
+            "newPassword" => "lucas", // should have at least 6 characters
+            "confirmNewPassword" => "lucas",
+        ];
+
+        $response = $this->actingAs($user)
+            ->putJson("/api/user/password", $data);
+
+        $response
+            ->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    [
+                        "title" => "must-be-at-least-6",
+                        "source" => [ "parameter" => "newPassword"]
+                    ]
+                ]
+            ]);
+    }
+
+    public function testUpdateUserMasterPasswordUsingSmallerMasterPassword() {
+        $user = User::factory()->create();
+        $data = [
+            "password" => "password",
+            "oldMasterPassword" => "password",
+            "newMasterPassword" => "lucas", // Should have at least 6 characters
+            "confirmNewMasterPassword" => "lucas",
+        ];
+
+        $response = $this->actingAs($user)
+            ->putJson("/api/user/masterPassword", $data);
+
+        $response
+            ->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    [
+                        "title" => "must-be-at-least-6",
+                        "source" => [ "parameter" => "newMasterPassword"]
+                    ]
+                ]
+            ]);
+    }
 }

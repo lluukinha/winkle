@@ -26,8 +26,8 @@ class RedefineUserPasswordRequest extends JSONRequest
         return [
             'token' => 'required|string',
             'email' => 'required|string',
-            'password' => 'required|string',
-            'confirmPassword' => 'required|string',
+            'password' => 'required|string|min:6',
+            'confirmPassword' => 'required|string|min:6',
         ];
     }
 
@@ -45,8 +45,10 @@ class RedefineUserPasswordRequest extends JSONRequest
             'email.string' => 'must-be-string',
             'password.required' => 'is-required',
             'password.string' => 'must-be-string',
+            'password.min' => 'must-be-at-least-6',
             'confirmPassword.required' => 'is-required',
             'confirmPassword.string' => 'must-be-string',
+            'confirmPassword.min' => 'must-be-at-least-6',
         ];
     }
 }

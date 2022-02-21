@@ -26,8 +26,8 @@ class UpdateUserMasterPasswordRequest extends JSONRequest
         return [
             'password' => 'required|string',
             'oldMasterPassword' => 'required|string',
-            'newMasterPassword' => 'required|string',
-            'confirmNewMasterPassword' => 'required|string',
+            'newMasterPassword' => 'required|string|min:6',
+            'confirmNewMasterPassword' => 'required|string|min:6',
         ];
     }
 
@@ -45,8 +45,10 @@ class UpdateUserMasterPasswordRequest extends JSONRequest
             'oldMasterPassword.string' => 'must-be-string',
             'newMasterPassword.required' => 'is-required',
             'newMasterPassword.string' => 'must-be-string',
+            'newMasterPassword.min' => 'must-be-at-least-6',
             'confirmNewMasterPassword.required' => 'is-required',
             'confirmNewMasterPassword.string' => 'must-be-string',
+            'confirmNewMasterPassword.min' => 'must-be-at-least-6',
         ];
     }
 }

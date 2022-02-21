@@ -16,6 +16,7 @@ use App\Exceptions\ApiExceptions\Http422;
 use App\Exceptions\User\UserEmailDoesNotMatchException;
 use App\Exceptions\User\UserHasEncryptedDataException;
 use App\Exceptions\User\UserHasInvalidTokenException;
+use App\Exceptions\User\UserHasResetPasswordInProgressException;
 use App\Exceptions\User\UserInvalidPasswordException;
 use App\Exceptions\User\UserNotFoundException;
 use App\Exceptions\User\UserOldPasswordIsIncorrectException;
@@ -93,6 +94,15 @@ class UserController extends Controller
             $user = User::whereEmail($email)->first();
             if (!$user) throw new UserNotFoundException();
 
+            $hasReset = DB::table('password_resets')
+                ->where([ 'email' => $user->email ])
+                ->where('created_at', [Carbon::now()->subDay(1), Carbon::now()->addDay(1)])
+                ->exists();
+
+            if ($hasReset) {
+                throw new UserHasResetPasswordInProgressException();
+            }
+
             $token = Str::random(10);
             DB::table('password_resets')->insert([
               'email' => $request->email,
@@ -105,6 +115,8 @@ class UserController extends Controller
             return response()->json(true);
         } catch (UserNotFoundException $e) {
             throw Http404::makeForField('email', 'forgot-password-user-not-found');
+        } catch (UserHasResetPasswordInProgressException $e) {
+            throw Http422::makeForField('user', 'user-has-reset-password-in-progress');
         }
     }
 

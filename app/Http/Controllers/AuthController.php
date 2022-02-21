@@ -82,10 +82,11 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token)
     {
+        $timeToExpire = 60 * 24; // 1 day
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60,
+            'expires_in' => auth()->factory()->getTTL() * $timeToExpire,
             'user' => auth()->user()->name
         ]);
     }

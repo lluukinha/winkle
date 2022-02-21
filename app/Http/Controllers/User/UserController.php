@@ -96,7 +96,7 @@ class UserController extends Controller
 
             $hasReset = DB::table('password_resets')
                 ->where([ 'email' => $user->email ])
-                ->where('created_at', [Carbon::now()->subDay(1), Carbon::now()->addDay(1)])
+                ->where('expires_at', '>', Carbon::now())
                 ->exists();
 
             if ($hasReset) {

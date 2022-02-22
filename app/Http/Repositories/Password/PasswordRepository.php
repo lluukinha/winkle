@@ -41,7 +41,7 @@ class PasswordRepository {
     }
 
     private function removeFolderIfNeeded(int $folderId) : void {
-        $folder = Auth::user()->folders
+        $folder = Auth::user()->folders()
             ->where([ 'id' => $folderId, 'model' => 'passwords' ])->first();
         if ($folder->passwords->count() === 0) {
             $folder->delete();

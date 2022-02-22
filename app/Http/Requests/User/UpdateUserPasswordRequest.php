@@ -26,7 +26,7 @@ class UpdateUserPasswordRequest extends JSONRequest
         return [
             'password' => 'required|string',
             'newPassword' => 'required|string|min:6',
-            'confirmNewPassword' => 'required|string|min:6',
+            'confirmNewPassword' => 'required|string',
         ];
     }
 
@@ -45,7 +45,6 @@ class UpdateUserPasswordRequest extends JSONRequest
             'newPassword.min' => 'must-be-at-least-6',
             'confirmNewPassword.required' => 'is-required',
             'confirmNewPassword.string' => 'must-be-string',
-            'confirmNewPassword.min' => 'must-be-at-least-6',
         ];
     }
 }

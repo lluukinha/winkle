@@ -19,6 +19,8 @@ class CreateFoldersTable extends Migration
             $table->string('name');
             $table->string('model');
             $table->timestamps();
+
+            $table->unique(['user_id', 'name', 'model'], 'user_folder');
         });
     }
 

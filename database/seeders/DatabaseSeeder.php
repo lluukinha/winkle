@@ -64,7 +64,7 @@ class DatabaseSeeder extends Seeder
         DB::table('folders')->insert([
             [
                 'id' => 1,
-                'name' => 'Redes Sociais',
+                'name' => 'REDES SOCIAIS',
                 'user_id' => 1,
                 'model' => 'passwords'
             ]

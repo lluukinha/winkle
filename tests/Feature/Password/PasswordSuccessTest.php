@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Password;
 
+use App\Models\Folder;
 use App\Models\Password;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -43,6 +44,61 @@ class PasswordSuccessTest extends TestCase
                 'data' => [
                     "name" => $data["name"],
                     "url" => $data["url"]
+                ]
+            ]);
+    }
+
+    public function testCreatePasswordAndAFolder() {
+        $user = User::factory()->create();
+
+        $data = [
+            "name" => "Quindim do Marcos",
+            "url" => "https://www.teste.com.br",
+            "folder" => [
+                "id" => null,
+                "name" => "escola"
+            ]
+        ];
+
+        $response = $this->actingAs($user)->postJson("/api/passwords", $data);
+        $response
+            ->assertStatus(201)
+            ->assertJson([
+                'data' => [
+                    "name" => $data["name"],
+                    "url" => $data["url"],
+                    "folder" => [
+                        "name" => "ESCOLA"
+                    ]
+                ]
+            ]);
+    }
+
+    public function testCreatePasswordAndSelectExistingFolderWithoutId() {
+        $user = User::factory()->create();
+        $folder = Folder::factory()
+            ->create([ 'user_id' => $user->id, 'model' => 'passwords' ]);
+
+        $data = [
+            "name" => "Quindim do Marcos",
+            "url" => "https://www.teste.com.br",
+            "folder" => [
+                "id" => null,
+                "name" => $folder->name
+            ]
+        ];
+
+        $response = $this->actingAs($user)->postJson("/api/passwords", $data);
+        $response
+            ->assertStatus(201)
+            ->assertJson([
+                'data' => [
+                    "name" => $data["name"],
+                    "url" => $data["url"],
+                    "folder" => [
+                        "id" => $folder->id,
+                        "name" => $folder->name
+                    ]
                 ]
             ]);
     }

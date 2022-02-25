@@ -80,6 +80,14 @@ class UserSeeder extends Seeder {
                 'password' => Hash::make('password'),
                 'master_password' => Hash::make('password'),
                 'status_id' => 2
+            ],
+            [
+                'id' => 6,
+                'name' => 'Laís Ferreira de Souza',
+                'email' => 'lais@winkle.app',
+                'password' => Hash::make('password'),
+                'master_password' => Hash::make('password'),
+                'status_id' => 2
             ]
         ]);
 

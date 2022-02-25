@@ -113,6 +113,17 @@ class SaleSeeder extends Seeder {
                 'value_total' => 0,
                 'final_value' => 0,
             ],
+            [
+                'id' => 6,
+                'user_id' => 6,
+                'created_at' => Carbon::now(),
+                'code' => 'VENDAUSER6',
+                'plan_id' => 5,
+                'status_id' => 4,
+                'updated_at' => Carbon::now(),
+                'value_total' => 0,
+                'final_value' => 0,
+            ],
         ]);
 
         Schema::enableForeignKeyConstraints();

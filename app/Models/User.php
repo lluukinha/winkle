@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -61,6 +62,33 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function sales() {
+        return $this->hasMany(Sale::class);
+    }
+
+    public function lastActiveSale() {
+        return $this
+            ->sales()
+            ->whereIn('status_id', [3,4])
+            ->orderBy('created_at', 'desc')
+            ->first();
+    }
+
+    public function currentPlan() {
+        $lastSale = $this->lastActiveSale();
+        if (!$lastSale) return null;
+        return $lastSale->plan;
+    }
+
+    public function expirationDate() {
+        $lastSale = $this->lastActiveSale();
+        if (!$lastSale) return null;
+        $startPlan = $lastSale()->created_at;
+        $months = $this->currentPlan()->duration;
+        $endPlan = (new Carbon($startPlan))->addMonths($months);
+        return $endPlan;
     }
 
     public function passwords() {

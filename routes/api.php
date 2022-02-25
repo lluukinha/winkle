@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Password\PasswordController;
+use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\User\UserController;
 
 /*
@@ -16,6 +17,8 @@ use App\Http\Controllers\User\UserController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Route::post('transaction/pagseguro', [PaymentController::class, 'notify']);
 
 Route::post('forgot-password', [UserController::class, 'forgotPassword']);
 Route::post('reset-password', [UserController::class, 'resetPassword']);

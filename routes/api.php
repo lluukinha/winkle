@@ -19,6 +19,7 @@ use App\Http\Controllers\User\UserController;
 */
 
 Route::post('transaction/pagseguro', [PaymentController::class, 'notify']);
+Route::get('transaction/pagseguro/notify', [PaymentController::class, 'notifyEmail']);
 
 Route::post('forgot-password', [UserController::class, 'forgotPassword']);
 Route::post('reset-password', [UserController::class, 'resetPassword']);

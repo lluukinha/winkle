@@ -9,6 +9,7 @@ use App\Mail\SendUserRegistrationMail;
 use App\Models\Plan;
 use App\Models\Sale;
 use App\Models\User;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -16,6 +17,26 @@ use Illuminate\Support\Str;
 
 class PaymentController extends Controller
 {
+    public function notifyEmail(Request $request) {
+        $email = $request->email;
+
+        if (is_null($email)) {
+            throw Http422::makeForField('email', 'not-found');
+        }
+
+        $user = User::where('email', $request->email)->first();
+        if (is_null($user)) {
+            throw Http404::makeForField('user', 'not-found');
+        }
+
+        if ($user->status_id === 1 && !is_null($user->expirationDate()) && $user->expirationDate() > Carbon::now()) {
+            Mail::to($user->email)->send(new SendUserRegistrationMail($user, $user->remember_token));
+            return response()->json(true);
+        } else {
+            throw Http404::makeForField('user', 'not-found');
+        }
+    }
+
     public function notify(Request $request) {
         $notificationId = $request->notificationCode;
 

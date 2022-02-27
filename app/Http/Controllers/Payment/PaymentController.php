@@ -2,19 +2,27 @@
 
 namespace App\Http\Controllers\Payment;
 
+use App\Exceptions\ApiExceptions\Http404;
+use App\Exceptions\ApiExceptions\Http422;
 use App\Http\Controllers\Controller;
+use App\Mail\SendUserRegistrationMail;
 use App\Models\Plan;
 use App\Models\Sale;
 use App\Models\User;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class PaymentController extends Controller
 {
     public function notify(Request $request) {
         $notificationId = $request->notificationCode;
+
+        if (is_null($notificationId)) {
+            throw Http422::makeForField('notificationId', 'not-found');
+        }
+
         $email = env('EMAIL_PAGSEGURO');
         $token = env('TOKEN_PAGSEGURO');
         $url = "https://ws.pagseguro.uol.com.br/v3/transactions/notifications/" . $notificationId;
@@ -30,19 +38,22 @@ class PaymentController extends Controller
         // START USER
         $user = User::where('email', $xml->sender->email)->first();
         if (!$user) {
-            $temporaryPassword = Str::random(10);
             $user = new User();
             $user->name = $xml->sender->name;
             $user->email = $xml->sender->email;
             $user->area_code = $xml->sender->phone->areaCode;
             $user->phone = $xml->sender->phone->number;
             $user->status_id = 1; // 1 = PENDENTE
-            $user->password = Hash::make($temporaryPassword);
+            $user->remember_token = Str::random(10);
             $user->save();
         }
         // END USER
 
         $plan = Plan::where('name', $xml->reference)->first();
+
+        if (is_null($plan)) {
+            throw Http404::makeForField('plan', 'not-found');
+        }
 
         $sale = Sale::where('code', $xml->code)->first();
         if (!$sale) {
@@ -66,6 +77,10 @@ class PaymentController extends Controller
         $sale->updated_at = $xml->lastEventDate;
         $sale->transaction_body = json_encode($xml);
         $sale->save();
+
+        if ($user->status_id === 1 && ($sale->status_id == 3 || $sale->status_id == 4)) {
+            Mail::to($user->email)->send(new SendUserRegistrationMail($user, $user->remember_token));
+        }
 
         return response(true, 200);
         // return json_encode($xml);

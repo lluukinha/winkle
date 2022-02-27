@@ -22,6 +22,9 @@ Route::post('transaction/pagseguro', [PaymentController::class, 'notify']);
 
 Route::post('forgot-password', [UserController::class, 'forgotPassword']);
 Route::post('reset-password', [UserController::class, 'resetPassword']);
+Route::post('verify-registration', [UserController::class, 'verifyRegistration']);
+Route::post('finish-registration', [UserController::class, 'finishRegistration']);
+
 Route::group([ 'middleware' => 'api', 'prefix' => 'auth' ], function ($router) {
     Route::post('login', [AuthController::class, 'login']);
 });

@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ApiExceptions\Http404;
+use App\Exceptions\ApiExceptions\Http422;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -23,8 +28,23 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login()
+    public function login(Request $request)
     {
+        $user = User::where(['email' => $request->email, 'status_id' => 2])
+            ->whereNotNull('password')
+            ->whereNotNull('master_password')
+            ->first();
+
+        if (!$user) {
+            throw Http404::makeForField('user', 'not-found');
+        }
+
+        $expirationDate = $user->expirationDate();
+
+        if (is_null($expirationDate) || $expirationDate < Carbon::now()) {
+            throw Http422::makeForField('user', 'plan-expired');
+        }
+
         $credentials = request(['email', 'password']);
 
         if (! $token = auth()->attempt($credentials)) {

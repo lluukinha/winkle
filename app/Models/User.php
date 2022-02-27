@@ -89,7 +89,7 @@ class User extends Authenticatable implements JWTSubject
     public function expirationDate() {
         $lastSale = $this->lastActiveSale();
         if (!$lastSale) return null;
-        $startPlan = $lastSale()->created_at;
+        $startPlan = $lastSale->created_at;
         $months = $this->currentPlan()->duration;
         $endPlan = (new Carbon($startPlan))->addMonths($months);
         return $endPlan;

@@ -23,7 +23,9 @@ use App\Exceptions\User\UserOldPasswordIsIncorrectException;
 use App\Exceptions\User\UserPasswordDidNotChangeException;
 use App\Exceptions\User\UserPasswordDoesNotMatchException;
 use App\Http\Repositories\User\UserRepository;
+use App\Http\Requests\User\FinishRegistrationRequest;
 use App\Http\Requests\User\RedefineUserPasswordRequest;
+use App\Http\Requests\User\VerifyRegistrationRequest;
 use App\Mail\SendForgotPasswordMail;
 use App\Models\User;
 use Carbon\Carbon;
@@ -35,6 +37,70 @@ use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
+    public function verifyRegistration(VerifyRegistrationRequest $request) {
+        try {
+            $attributes = $request->validated();
+
+            $fields = [
+                'email' => $attributes['email'],
+                'remember_token' => $attributes['token'],
+                'status_id' => 1
+            ];
+
+            $user = User::where($fields)
+                ->whereNull('password')
+                ->whereNull('master_password')
+                ->first();
+
+            if (!$user || (is_null($user->expirationDate()) || $user->expirationDate() < Carbon::now())) {
+                throw new UserNotFoundException();
+            }
+
+            return response()->json(true);
+        } catch (UserNotFoundException $e) {
+            throw Http404::makeForField('user', 'not-found');
+        }
+    }
+
+    public function finishRegistration(FinishRegistrationRequest $request) {
+        try {
+            $attributes = $request->validated();
+
+            $fields = [
+                'email' => $attributes['email'],
+                'remember_token' => $attributes['token'],
+                'status_id' => 1
+            ];
+
+            $user = User::where($fields)
+                ->whereNull('password')
+                ->whereNull('master_password')
+                ->first();
+
+            if (!$user) {
+                throw new UserNotFoundException();
+            }
+
+            $passwordsDoesNotMatch = ($attributes["password"] != $attributes["confirmPassword"])
+                || ($attributes["masterPassword"] != $attributes["confirmMasterPassword"]);
+
+            if ($passwordsDoesNotMatch) {
+                throw new UserPasswordDoesNotMatchException();
+            }
+
+            $user->password = Hash::make($attributes['password']);
+            $user->master_password = Hash::make($attributes['masterPassword']);
+            $user->status_id = 2;
+            $user->email_verified_at = Carbon::now();
+            $user->save();
+
+            return new UserResource($user);
+        } catch (UserNotFoundException $e) {
+            throw Http404::makeForField('user', 'not-found');
+        } catch (UserPasswordDoesNotMatchException $e) {
+            throw Http422::makeForField('password', 'password-does-not-match');
+        }
+    }
 
     public function resetPassword(RedefineUserPasswordRequest $request) {
         try {

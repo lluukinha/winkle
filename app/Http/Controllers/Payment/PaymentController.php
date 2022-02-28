@@ -56,6 +56,12 @@ class PaymentController extends Controller
 
         $xml = simplexml_load_string($response->getBody(),'SimpleXMLElement',LIBXML_NOCDATA);
 
+        $plan = Plan::where('name', $xml->reference)->first();
+
+        if (is_null($plan)) {
+            throw Http404::makeForField('plan', 'not-found');
+        }
+
         // START USER
         $user = User::where('email', $xml->sender->email)->first();
         if (!$user) {
@@ -70,12 +76,6 @@ class PaymentController extends Controller
         }
         // END USER
 
-        $plan = Plan::where('name', $xml->reference)->first();
-
-        if (is_null($plan)) {
-            throw Http404::makeForField('plan', 'not-found');
-        }
-
         $sale = Sale::where('code', $xml->code)->first();
         if (!$sale) {
             $sale = new Sale();
@@ -83,20 +83,20 @@ class PaymentController extends Controller
             $sale->created_at = $xml->date;
             $sale->code = $xml->code;
             $sale->plan_id = $plan->id;
-            $sale->status_id = $xml->status;
-            $sale->cancellation_source = $xml->cancellationSource;
-            $sale->updated_at = $xml->lastEventDate;
             $sale->value_total = $xml->grossAmount;
             $sale->final_value = $xml->netAmount;
-            $sale->transaction_body = json_encode($xml);
-            $sale->save();
-        } else {
-            $sale->status_id = $xml->status;
-            $sale->cancellation_source = $xml->cancellationSource;
-            $sale->updated_at = $xml->lastEventDate;
-            $sale->transaction_body = json_encode($xml);
-            $sale->save();
+            // $sale->status_id = $xml->status;
+            // $sale->cancellation_source = $xml->cancellationSource;
+            // $sale->updated_at = $xml->lastEventDate;
+            // $sale->transaction_body = json_encode($xml);
+            // $sale->save();
         }
+
+        $sale->status_id = $xml->status;
+        $sale->cancellation_source = $xml->cancellationSource;
+        $sale->updated_at = $xml->lastEventDate;
+        $sale->transaction_body = json_encode($xml);
+        $sale->save();
 
         if ($user->status_id === 1 && ($sale->status_id == 3 || $sale->status_id == 4)) {
             Mail::to($user->email)->send(new SendUserRegistrationMail($user, $user->remember_token));

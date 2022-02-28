@@ -90,14 +90,13 @@ class PaymentController extends Controller
             $sale->final_value = $xml->netAmount;
             $sale->transaction_body = json_encode($xml);
             $sale->save();
-            return response(true, 200);
+        } else {
+            $sale->status_id = $xml->status;
+            $sale->cancellation_source = $xml->cancellationSource;
+            $sale->updated_at = $xml->lastEventDate;
+            $sale->transaction_body = json_encode($xml);
+            $sale->save();
         }
-
-        $sale->status_id = $xml->status;
-        $sale->cancellation_source = $xml->cancellationSource;
-        $sale->updated_at = $xml->lastEventDate;
-        $sale->transaction_body = json_encode($xml);
-        $sale->save();
 
         if ($user->status_id === 1 && ($sale->status_id == 3 || $sale->status_id == 4)) {
             Mail::to($user->email)->send(new SendUserRegistrationMail($user, $user->remember_token));

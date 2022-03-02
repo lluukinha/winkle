@@ -106,10 +106,10 @@ class PasswordRepository {
             $model->name = $password->name;
         }
 
-        if ($password->url) $model->url = $password->url;
-        if ($password->login) $model->login = $password->login;
-        if ($password->password) $model->password = $password->password;
-        if ($password->description) $model->description = $password->description;
+        $model->url = $password->url;
+        $model->login = $password->login;
+        $model->password = $password->password;
+        $model->description = $password->description;
 
         $currentFolder = $model->folder;
         if (!is_null($password->folder_id) || !is_null($password->folder_name)) {

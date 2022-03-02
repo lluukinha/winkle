@@ -105,8 +105,11 @@ class User extends Authenticatable implements JWTSubject
 
     public function canUpdateMasterPassword() {
         $passwordsCount = $this->passwords()
-            ->whereNotNull('login')
-            ->orWhereNotNull('password')
+            ->where(function ($query) {
+                return $query
+                    ->whereNotNull('login')
+                    ->orWhereNotNull('password');
+            })
             ->count();
 
         return $passwordsCount == 0;

@@ -102,7 +102,7 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token)
     {
-        $timeToExpire = 60 * 24; // 1 day
+        $timeToExpire = 60; // 1 day
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',

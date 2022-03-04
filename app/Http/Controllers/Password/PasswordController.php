@@ -19,6 +19,7 @@ use App\Exceptions\Password\PasswordAlreadyExistsException;
 use App\Exceptions\Password\PasswordNotFoundException;
 use App\Http\Models\Password\PasswordModel;
 use App\Http\Repositories\Password\PasswordRepository;
+use App\Http\Requests\Password\CreateManyPasswordRequest;
 use App\Http\Resources\Password\PasswordFolderResource;
 
 class PasswordController extends Controller
@@ -43,6 +44,35 @@ class PasswordController extends Controller
             $attributes["folder"]["id"] ?? null,
             $attributes["folder"]["name"] ?? null,
         );
+    }
+
+    private function retrieveModels($list) : array {
+        $models = array_map(function($attributes) {
+            return new PasswordModel(
+                $attributes["name"],
+                $attributes["url"] ?? null,
+                $attributes["login"] ?? null,
+                $attributes["password"] ?? null,
+                $attributes["description"] ?? null,
+                null,
+                $attributes["folderName"] ?? null
+            );
+        }, $list);
+        return $models;
+    }
+
+    public function createMany(CreateManyPasswordRequest $request) {
+        try {
+            $attributes = $request->validated();
+            $passwordModels = $this->retrieveModels($attributes["list"]);
+            $repository = new PasswordRepository();
+            $updatedData = $repository->createMany($passwordModels);
+            return response()->json($updatedData);
+        } catch (PasswordAlreadyExistsException $e) {
+            throw Http422::makeForField('name', 'already-exists');
+        } catch (FolderNotFoundException $e) {
+            throw Http404::makeForField('folder', 'not-found');
+        }
     }
 
     public function create(CreatePasswordRequest $request) {
@@ -81,8 +111,8 @@ class PasswordController extends Controller
     public function delete($id) {
         try {
             $repository = new PasswordRepository();
-            $repository->delete($id);
-            return true;
+            $reloadFolders = $repository->delete($id);
+            return $reloadFolders ? $this->listFolders() : PasswordFolderResource::collection([]);;
         } catch (PasswordNotFoundException $e) {
             throw Http404::makeForField('password', 'not-found');
         }

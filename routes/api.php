@@ -42,6 +42,7 @@ Route::middleware('auth')->group(function($router) {
         Route::get('/folders', [PasswordController::class, 'listFolders']);
         Route::get('/', [PasswordController::class, 'list']);
         Route::post('/', [PasswordController::class, 'create']);
+        Route::post('/import', [PasswordController::class, 'createMany']);
         Route::put('/{id}', [PasswordController::class, 'update']);
         Route::delete('/{id}', [PasswordController::class, 'delete']);
     });

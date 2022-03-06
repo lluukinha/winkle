@@ -13,8 +13,8 @@ use App\Http\Resources\Password\PasswordResource;
 
 use App\Exceptions\ApiExceptions\Http404;
 use App\Exceptions\ApiExceptions\Http422;
-use App\Exceptions\Password\FolderHasPasswordsException;
-use App\Exceptions\Password\FolderNotFoundException;
+use App\Exceptions\Folder\FolderHasPasswordsException;
+use App\Exceptions\Folder\FolderNotFoundException;
 use App\Exceptions\Password\PasswordAlreadyExistsException;
 use App\Exceptions\Password\PasswordNotFoundException;
 use App\Http\Models\Password\PasswordModel;
@@ -27,11 +27,6 @@ class PasswordController extends Controller
     public function list() {
         $passwords = Auth::user()->passwords;
         return PasswordResource::collection($passwords);
-    }
-
-    public function listFolders() {
-        $folders = Auth::user()->folders()->where('model', 'passwords')->get();
-        return PasswordFolderResource::collection($folders);
     }
 
     private function retrieveModel($attributes) : PasswordModel {
@@ -111,8 +106,8 @@ class PasswordController extends Controller
     public function delete($id) {
         try {
             $repository = new PasswordRepository();
-            $reloadFolders = $repository->delete($id);
-            return $reloadFolders ? $this->listFolders() : PasswordFolderResource::collection([]);;
+            $isDeleted = $repository->delete($id);
+            return response()->json($isDeleted);
         } catch (PasswordNotFoundException $e) {
             throw Http404::makeForField('password', 'not-found');
         }

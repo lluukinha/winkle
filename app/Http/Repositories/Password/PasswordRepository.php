@@ -2,24 +2,20 @@
 
 namespace App\Http\Repositories\Password;
 
-use App\Exceptions\Password\FolderNotFoundException;
-use App\Exceptions\Password\PasswordAlreadyExistsException;
-use App\Exceptions\Password\PasswordNotFoundException;
 use App\Http\Models\Password\PasswordModel;
-use App\Models\Folder;
+use App\Http\Repositories\Folder\FolderRepository;
 use App\Models\Password;
 use Illuminate\Support\Facades\Auth;
+
+use App\Exceptions\Folder\FolderNotFoundException;
+use App\Exceptions\Password\PasswordAlreadyExistsException;
+use App\Exceptions\Password\PasswordNotFoundException;
 
 class PasswordRepository {
 
     private function retrievePasswordFromId(int $id) : Password {
         $password = Auth::user()->passwords->find($id);
         if (!$password) throw new PasswordNotFoundException();
-        return $password;
-    }
-
-    private function retrievePasswordFromName(string $name) : Password | null {
-        $password = Auth::user()->passwords()->where('name', $name)->first();
         return $password;
     }
 
@@ -33,49 +29,11 @@ class PasswordRepository {
         return $list ->where('name', $nameToCheck)->exists();
     }
 
-    private function retrieveFolderFromName(string $name) : Folder | null {
-        return Auth::user()->folders()
-            ->where([ 'name' => strtoupper($name), 'model' => 'passwords' ])
-            ->first();
-    }
-
-    private function retrieveFolderFromId(int $folderId) : Folder | null {
-        return Auth::user()->folders()
-            ->where([ 'id' => $folderId, 'model' => 'passwords' ])
-            ->first();
-    }
-
-    private function removeFolderIfNeeded(int $folderId) : void {
-        $folder = Auth::user()->folders()
-            ->where([ 'id' => $folderId, 'model' => 'passwords' ])->first();
-        if (!is_null($folder) && $folder->passwords->count() === 0) {
-            $folder->delete();
-        }
-    }
-
     public function delete(int $passwordId) : bool {
         $model = $this->retrievePasswordFromId($passwordId);
         if (!$model) throw new PasswordNotFoundException();
-        $folder = $model->folder;
         $model->delete();
-        if (!is_null($folder)) {
-            $this->removeFolderIfNeeded($folder->id);
-            return true;
-        }
-
-        return false;
-    }
-
-    private function createFolder(string $name) : Folder {
-        $findFolder = $this->retrieveFolderFromName($name);
-        if (!is_null($findFolder)) return $findFolder;
-
-        $folder = new Folder();
-        $folder->user_id = Auth::user()->id;
-        $folder->model = "passwords";
-        $folder->name = strtoupper($name);
-        $folder->save();
-        return $folder;
+        return true;
     }
 
     /*
@@ -116,6 +74,7 @@ class PasswordRepository {
     public function create(PasswordModel $password) : Password {
         if ($this->checkIfExists($password->name)) throw new PasswordAlreadyExistsException();
 
+        $folderRepository = new FolderRepository();
         $model = new Password();
         $model->user_id = Auth::user()->id;
         $model->name = $password->name;
@@ -126,11 +85,11 @@ class PasswordRepository {
 
         if (!is_null($password->folder_name)) {
             if (is_null($password->folder_id)) {
-                $folder = $this->createFolder($password->folder_name);
+                $folder = $folderRepository->create($password->folder_name);
             }
 
             if (!is_null($password->folder_id)) {
-                $folder = $this->retrieveFolderFromId($password->folder_id);
+                $folder = $folderRepository->retrieveFolderFromId($password->folder_id);
                 if (!$folder) throw new FolderNotFoundException();
             }
 
@@ -151,19 +110,21 @@ class PasswordRepository {
             $model->name = $password->name;
         }
 
+        $folderRepository = new FolderRepository();
         $model->url = $password->url;
         $model->login = $password->login;
         $model->password = $password->password;
         $model->description = $password->description;
 
         $currentFolder = $model->folder;
+
         if (!is_null($password->folder_id) || !is_null($password->folder_name)) {
             if (is_null($password->folder_id)) {
-                $folder = $this->createFolder($password->folder_name);
+                $folder = $folderRepository->create($password->folder_name);
             }
 
             if (!is_null($password->folder_id)) {
-                $folder = $this->retrieveFolderFromId($password->folder_id);
+                $folder = $folderRepository->retrieveFolderFromId($password->folder_id);
                 if (!$folder) {
                     throw new FolderNotFoundException();
                 }
@@ -178,10 +139,6 @@ class PasswordRepository {
         if ($clearFolderId) $model->folder_id = null;
 
         $model->save();
-        $model = $model->fresh();
-
-        if (!is_null($currentFolder)) $this->removeFolderIfNeeded($currentFolder->id);
-
-        return $model;
+        return $model->fresh();
     }
 }

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Folder\FolderController;
 use App\Http\Controllers\Password\PasswordController;
 use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\User\UserController;
@@ -38,8 +39,12 @@ Route::middleware('auth')->group(function($router) {
         Route::get('me', [AuthController::class, 'me']);
     });
 
+    Route::group(['prefix' => 'folders'], function($router) {
+        Route::get('/', [FolderController::class, 'list']);
+        Route::delete('/{id}', [FolderController::class, 'delete']);
+    });
+
     Route::group(['prefix' => 'passwords'], function($router) {
-        Route::get('/folders', [PasswordController::class, 'listFolders']);
         Route::get('/', [PasswordController::class, 'list']);
         Route::post('/', [PasswordController::class, 'create']);
         Route::post('/import', [PasswordController::class, 'createMany']);

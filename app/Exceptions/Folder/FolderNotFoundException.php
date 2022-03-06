@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Exceptions\Password;
+namespace App\Exceptions\Folder;
 
 use Exception;
 

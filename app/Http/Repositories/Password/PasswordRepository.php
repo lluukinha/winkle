@@ -41,9 +41,8 @@ class PasswordRepository {
     */
     public function createMany(array $passwords) : array {
 
-        $createdCount = 0;
-        $updatedCount = 0;
         $createdModels = [];
+        $updatedModels = [];
 
         $names = array_map(function ($password) {
             return $password->name;
@@ -58,17 +57,16 @@ class PasswordRepository {
             if (is_null($model) && is_null($createdModel)) {
                 $model = $this->create($password);
                 $createdModels[$password->name] = $model;
-                $createdCount ++;
                 continue;
             }
 
             $model = $model ?? $createdModel;
             $password->setId($model->id);
             $model = $this->update($password, $model);
-            $updatedCount ++;
+            $updatedModels[$model->name] = $model;
         }
 
-        return [ 'created' => $createdCount, 'updated' => $updatedCount ];
+        return [ 'created' => $createdModels, 'updated' => $updatedModels ];
     }
 
     public function create(PasswordModel $password) : Password {

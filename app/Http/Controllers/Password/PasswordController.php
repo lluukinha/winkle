@@ -61,8 +61,12 @@ class PasswordController extends Controller
             $attributes = $request->validated();
             $passwordModels = $this->retrieveModels($attributes["list"]);
             $repository = new PasswordRepository();
-            $updatedData = $repository->createMany($passwordModels);
-            return response()->json($updatedData);
+            $response = $repository->createMany($passwordModels);
+
+            $created = PasswordResource::collection($response['created']);
+            $updated = PasswordResource::collection($response['updated']);
+
+            return response()->json([ 'created' => $created, 'updated' => $updated ]);
         } catch (PasswordAlreadyExistsException $e) {
             throw Http422::makeForField('name', 'already-exists');
         } catch (FolderNotFoundException $e) {

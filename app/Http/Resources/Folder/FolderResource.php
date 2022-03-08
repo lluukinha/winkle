@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Resources\Password;
+namespace App\Http\Resources\Folder;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class PasswordFolderResource extends JsonResource
+class FolderResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

@@ -41,6 +41,8 @@ Route::middleware('auth')->group(function($router) {
 
     Route::group(['prefix' => 'folders'], function($router) {
         Route::get('/', [FolderController::class, 'list']);
+        Route::post('/', [FolderController::class, 'create']);
+        Route::put('/{id}', [FolderController::class, 'update']);
         Route::delete('/{id}', [FolderController::class, 'delete']);
     });
 

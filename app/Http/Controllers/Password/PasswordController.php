@@ -20,7 +20,6 @@ use App\Exceptions\Password\PasswordNotFoundException;
 use App\Http\Models\Password\PasswordModel;
 use App\Http\Repositories\Password\PasswordRepository;
 use App\Http\Requests\Password\CreateManyPasswordRequest;
-use App\Http\Resources\Password\PasswordFolderResource;
 
 class PasswordController extends Controller
 {

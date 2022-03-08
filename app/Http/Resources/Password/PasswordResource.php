@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Password;
 
+use App\Http\Resources\Folder\FolderResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Crypt;
 
@@ -24,7 +25,7 @@ class PasswordResource extends JsonResource
             'password' => (string) $this->password ? Crypt::decryptString($this->password) : '',
             'description' => (string) $this->description,
             'lastUpdate' => (string) $this->updated_at,
-            'folder' => $this->folder ? new PasswordFolderResource($this->folder) : [ "id" => "", "name" => "" ]
+            'folder' => $this->folder ? new FolderResource($this->folder) : [ "id" => "", "name" => "" ]
         ];
     }
 }

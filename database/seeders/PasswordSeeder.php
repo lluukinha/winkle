@@ -23,7 +23,6 @@ class PasswordSeeder extends Seeder {
                 'id' => 1,
                 'name' => 'REDES SOCIAIS',
                 'user_id' => 1,
-                'model' => 'passwords'
             ]
         ]);
 

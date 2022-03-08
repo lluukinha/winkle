@@ -76,8 +76,7 @@ class PasswordSuccessTest extends TestCase
 
     public function testCreatePasswordAndSelectExistingFolderWithoutId() {
         $user = User::factory()->create();
-        $folder = Folder::factory()
-            ->create([ 'user_id' => $user->id, 'model' => 'passwords' ]);
+        $folder = Folder::factory()->create([ 'user_id' => $user->id ]);
 
         $data = [
             "name" => "Quindim do Marcos",

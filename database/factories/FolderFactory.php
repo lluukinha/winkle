@@ -14,10 +14,8 @@ class FolderFactory extends Factory
      */
     public function definition()
     {
-        $models = [ 'passwords', 'emails', 'notes' ];
         return [
             'name' => strtoupper($this->faker->name()),
-            'model' => array_rand($models),
             'user_id' => User::factory()->create()->id
         ];
     }

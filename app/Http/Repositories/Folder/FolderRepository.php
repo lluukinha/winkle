@@ -23,7 +23,7 @@ class FolderRepository {
     private function checkIfExists(string $nameToCheck, int $currentId = null) : bool {
         $list = Auth::user()->folders();
         if (!is_null($currentId)) $list = $list->where('id', '<>', $currentId);
-        return $list ->where('name', $nameToCheck)->exists();
+        return $list->where('name', $nameToCheck)->exists();
     }
 
     public function forceCreate(string $name) : Folder {

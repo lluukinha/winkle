@@ -51,6 +51,7 @@ Route::middleware('auth')->group(function($router) {
         Route::post('/', [PasswordController::class, 'create']);
         Route::post('/import', [PasswordController::class, 'createMany']);
         Route::put('/{id}', [PasswordController::class, 'update']);
+        Route::put('/{id}/folder/{folderId}', [PasswordController::class, 'updateFolder']);
         Route::delete('/{id}', [PasswordController::class, 'delete']);
     });
 

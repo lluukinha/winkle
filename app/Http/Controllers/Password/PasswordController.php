@@ -20,6 +20,7 @@ use App\Exceptions\Password\PasswordNotFoundException;
 use App\Http\Models\Password\PasswordModel;
 use App\Http\Repositories\Password\PasswordRepository;
 use App\Http\Requests\Password\CreateManyPasswordRequest;
+use Illuminate\Auth\Events\PasswordReset;
 
 class PasswordController extends Controller
 {
@@ -82,6 +83,29 @@ class PasswordController extends Controller
             return new PasswordResource($password);
         } catch (PasswordAlreadyExistsException $e) {
             throw Http422::makeForField('name', 'already-exists');
+        } catch (FolderNotFoundException $e) {
+            throw Http404::makeForField('folder', 'not-found');
+        }
+    }
+
+    public function updateFolder(int $id, int $folderId) {
+        try {
+            $password = Auth::user()->passwords()->find($id);
+            if (!$password) {
+                throw new PasswordNotFoundException();
+            }
+
+            $folder = Auth::user()->folders()->find($folderId);
+            if (!$folder) {
+                throw new FolderNotFoundException();
+            }
+
+            $password->folder_id = $folderId;
+            $password->save();
+
+            return new PasswordResource($password->fresh());
+        } catch (PasswordNotFoundException $e) {
+            throw Http404::makeForField('password', 'not-found');
         } catch (FolderNotFoundException $e) {
             throw Http404::makeForField('folder', 'not-found');
         }

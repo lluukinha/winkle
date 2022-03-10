@@ -88,17 +88,27 @@ class PasswordController extends Controller
         }
     }
 
+    public function removeFolder(int $id) {
+        try {
+            $password = Auth::user()->passwords()->find($id);
+            if (!$password) throw new PasswordNotFoundException();
+
+            $password->folder_id = null;
+            $password->save();
+
+            return new PasswordResource($password->fresh());
+        } catch (PasswordNotFoundException $e) {
+            throw Http404::makeForField('password', 'not-found');
+        }
+    }
+
     public function updateFolder(int $id, int $folderId) {
         try {
             $password = Auth::user()->passwords()->find($id);
-            if (!$password) {
-                throw new PasswordNotFoundException();
-            }
+            if (!$password) throw new PasswordNotFoundException();
 
             $folder = Auth::user()->folders()->find($folderId);
-            if (!$folder) {
-                throw new FolderNotFoundException();
-            }
+            if (!$folder) throw new FolderNotFoundException();
 
             $password->folder_id = $folderId;
             $password->save();

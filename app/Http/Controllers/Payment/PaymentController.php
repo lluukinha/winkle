@@ -66,10 +66,8 @@ class PaymentController extends Controller
         $user = User::where('email', $xml->sender->email)->first();
         if (!$user) {
             $user = new User();
-            $user->name = $xml->sender->name ?? '';
+            $user->name = 'usuario pendente';
             $user->email = $xml->sender->email;
-            $user->area_code = $xml->sender->phone->areaCode ?? null;
-            $user->phone = $xml->sender->phone->number ?? null;
             $user->status_id = 1; // 1 = PENDENTE
             $user->remember_token = Str::random(10);
             $user->save();
@@ -85,11 +83,6 @@ class PaymentController extends Controller
             $sale->plan_id = $plan->id;
             $sale->value_total = $xml->grossAmount;
             $sale->final_value = $xml->netAmount;
-            // $sale->status_id = $xml->status;
-            // $sale->cancellation_source = $xml->cancellationSource;
-            // $sale->updated_at = $xml->lastEventDate;
-            // $sale->transaction_body = json_encode($xml);
-            // $sale->save();
         }
 
         $sale->status_id = $xml->status;

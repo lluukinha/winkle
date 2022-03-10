@@ -1,6 +1,6 @@
 <html>
   <body>
-    <p>Olá {{ $user->name }}!</p>
+    <p>Olá {{ $user->name ?? '' }}!</p>
     <p></p>
     <p>Seu cadastro no <b>Winkle</b>, sistema de gerenciamento de senhas está quase finalizado!</p>
     <p></p>

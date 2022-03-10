@@ -71,7 +71,7 @@ class PaymentController extends Controller
             $model->status_id = 1; // 1 = PENDENTE
             $model->remember_token = Str::random(10);
             $model->save();
-            $user = $model;
+            $user = $model->fresh();
         }
         // END USER
 
@@ -93,7 +93,9 @@ class PaymentController extends Controller
         $sale->save();
 
         if ($user->status_id === 1 && ($sale->status_id == 3 || $sale->status_id == 4)) {
-            Mail::to($user->email)->send(new SendUserRegistrationMail($user));
+            echo "enviando e-mail para ".$user->email."<br>";
+            $mail = Mail::to($user->email)->send(new SendUserRegistrationMail($user));
+            print_r($mail);
         }
 
         return response(true, 200);

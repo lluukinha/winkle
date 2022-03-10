@@ -4,7 +4,7 @@
     <p></p>
     <p>Seu cadastro no <b>Winkle</b>, sistema de gerenciamento de senhas está quase finalizado!</p>
     <p></p>
-    <p>Para finalizar seu cadastro, <a href="https://winkle.app/registration/{{$user->email}}/{{$token}}" target="_blank">clique aqui</a></p>
+    <p>Para finalizar seu cadastro, <a href="https://winkle.app/registration/{{$user->email}}/{{$user->remember_token}}" target="_blank">clique aqui</a></p>
     <p></p>
     <p>
       Caso o link acima não funcione, copie e cole o link a seguir em seu navegador:<br>

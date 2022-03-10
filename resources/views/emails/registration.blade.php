@@ -1,6 +1,6 @@
 <html>
   <body>
-    <p>Olá {{ $user->name ?? '' }}!</p>
+    <p>Olá {{ $user->email }}!</p>
     <p></p>
     <p>Seu cadastro no <b>Winkle</b>, sistema de gerenciamento de senhas está quase finalizado!</p>
     <p></p>
@@ -8,7 +8,7 @@
     <p></p>
     <p>
       Caso o link acima não funcione, copie e cole o link a seguir em seu navegador:<br>
-      <b>https://winkle.app/registration/{{$user->email}}/{{$token}}</b>
+      <b>https://winkle.app/registration/{{$user->email}}/{{$user->remember_token}}</b>
     </p>
     <p></p>
     <p>Terminando seu cadastro, você terá acesso a uma nova forma de agrupar suas senhas, sem precisar usar a mesma em todo website.</p>

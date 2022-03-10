@@ -65,12 +65,13 @@ class PaymentController extends Controller
         // START USER
         $user = User::where('email', $xml->sender->email)->first();
         if (!$user) {
-            $user = new User();
-            $user->name = 'usuario pendente';
-            $user->email = $xml->sender->email;
-            $user->status_id = 1; // 1 = PENDENTE
-            $user->remember_token = Str::random(10);
-            $user->save();
+            $model = new User();
+            $model->name = 'usuario pendente';
+            $model->email = $xml->sender->email;
+            $model->status_id = 1; // 1 = PENDENTE
+            $model->remember_token = Str::random(10);
+            $model->save();
+            $user = $model;
         }
         // END USER
 
@@ -92,7 +93,7 @@ class PaymentController extends Controller
         $sale->save();
 
         if ($user->status_id === 1 && ($sale->status_id == 3 || $sale->status_id == 4)) {
-            Mail::to($user->email)->send(new SendUserRegistrationMail($user, $user->remember_token));
+            Mail::to($user->email)->send(new SendUserRegistrationMail($user));
         }
 
         return response(true, 200);

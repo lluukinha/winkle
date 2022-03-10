@@ -18,10 +18,9 @@ class SendUserRegistrationMail extends Mailable
      *
      * @return void
      */
-    public function __construct(User $user, string $token)
+    public function __construct(User $user)
     {
         $this->user = $user;
-        $this->token = $token;
     }
 
     /**
@@ -33,9 +32,6 @@ class SendUserRegistrationMail extends Mailable
     {
         return $this->view('emails.registration')
             ->subject('Finalize seu cadastro')
-            ->with([
-                'user' => $this->user,
-                'token' => $this->token
-            ]);
+            ->with([ 'user' => $this->user ]);
     }
 }

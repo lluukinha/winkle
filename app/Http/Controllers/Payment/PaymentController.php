@@ -93,9 +93,8 @@ class PaymentController extends Controller
         $sale->save();
 
         if ($user->status_id === 1 && ($sale->status_id == 3 || $sale->status_id == 4)) {
-            echo "enviando e-mail para ".$user->email."<br>";
+            echo "enviando e-mail para ".$user->email."\n";
             $mail = Mail::to($user->email)->send(new SendUserRegistrationMail($user));
-            print_r($mail);
         }
 
         return response(true, 200);

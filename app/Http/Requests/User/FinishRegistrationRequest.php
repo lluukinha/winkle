@@ -24,6 +24,9 @@ class FinishRegistrationRequest extends JSONRequest
     public function rules()
     {
         return [
+            'name' => 'required|string',
+            'area_code' => 'int|nullable',
+            'phone' => 'int|nullable',
             'token' => 'required|string',
             'email' => 'required|string',
             'password' => 'required|string|min:6',
@@ -41,6 +44,10 @@ class FinishRegistrationRequest extends JSONRequest
     public function messages()
     {
         return [
+            'name.required' => 'is-required',
+            'name.string' => 'must-be-string',
+            'area_code.number' => 'must-be-number',
+            'phone.number' => 'must-be-number',
             'token.required' => 'is-required',
             'token.string' => 'must-be-string',
             'email.required' => 'is-required',

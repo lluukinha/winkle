@@ -88,6 +88,9 @@ class UserController extends Controller
                 throw new UserPasswordDoesNotMatchException();
             }
 
+            $user->name = $attributes['name'];
+            $user->area_code = $attributes['area_code'];
+            $user->phone = $attributes['phone'];
             $user->password = Hash::make($attributes['password']);
             $user->master_password = Hash::make($attributes['masterPassword']);
             $user->status_id = 2;

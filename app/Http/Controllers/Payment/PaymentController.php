@@ -66,10 +66,10 @@ class PaymentController extends Controller
         $user = User::where('email', $xml->sender->email)->first();
         if (!$user) {
             $user = new User();
-            $user->name = $xml->sender->name;
+            $user->name = $xml->sender->name ?? '';
             $user->email = $xml->sender->email;
-            $user->area_code = $xml->sender->phone->areaCode;
-            $user->phone = $xml->sender->phone->number;
+            $user->area_code = $xml->sender->phone->areaCode ?? null;
+            $user->phone = $xml->sender->phone->number ?? null;
             $user->status_id = 1; // 1 = PENDENTE
             $user->remember_token = Str::random(10);
             $user->save();
@@ -93,7 +93,7 @@ class PaymentController extends Controller
         }
 
         $sale->status_id = $xml->status;
-        $sale->cancellation_source = $xml->cancellationSource;
+        $sale->cancellation_source = $xml->cancellationSource ?? null;
         $sale->updated_at = $xml->lastEventDate;
         $sale->transaction_body = json_encode($xml);
         $sale->save();

@@ -6,6 +6,8 @@ use App\Exceptions\ApiExceptions\Http404;
 use App\Exceptions\ApiExceptions\Http422;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Password\GetPasswordsFromExtensionRequest;
+use App\Http\Resources\Password\PasswordResource;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -20,7 +22,35 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
+        $this->middleware('auth:api', ['except' => ['login', 'getPasswordsFromExtension']]);
+    }
+
+    public function getPasswordsFromExtension(GetPasswordsFromExtensionRequest $request) {
+
+        $attributes = $request->validated();
+
+        $user = User::where(['email' => $attributes['email'], 'status_id' => 2])
+            ->whereNotNull('password')
+            ->whereNotNull('master_password')
+            ->first();
+
+        if (!$user) throw Http404::makeForField('user', 'not-found');
+
+        $expirationDate = $user->expirationDate();
+        if (is_null($expirationDate) || $expirationDate < Carbon::now()) {
+            throw Http422::makeForField('user', 'plan-expired');
+        }
+
+        if (!Hash::check($attributes['password'], $user->password)) {
+            throw Http422::makeForField('password', 'incorrect');
+        }
+
+        if (!Hash::check($attributes['masterPassword'], $user->master_password)) {
+            throw Http422::makeForField('master-password', 'incorrect');
+        }
+
+        $passwords = $user->passwords()->whereNotNull('password')->get();
+        return PasswordResource::collection($passwords);
     }
 
     /**

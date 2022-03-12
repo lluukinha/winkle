@@ -29,6 +29,7 @@ Route::post('finish-registration', [UserController::class, 'finishRegistration']
 
 Route::group([ 'middleware' => 'api', 'prefix' => 'auth' ], function ($router) {
     Route::post('login', [AuthController::class, 'login']);
+    Route::post('get-passwords-from-extension', [AuthController::class, 'getPasswordsFromExtension']);
 });
 
 Route::middleware('auth')->group(function($router) {

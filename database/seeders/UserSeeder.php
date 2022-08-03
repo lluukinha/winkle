@@ -47,7 +47,8 @@ class UserSeeder extends Seeder {
                 'email' => 'lucas@winkle.app',
                 'password' => Hash::make('password'),
                 'master_password' => Hash::make('password'),
-                'status_id' => 2
+                'status_id' => 2,
+                'admin' => true
             ],
             [
                 'id' => 2,
@@ -55,7 +56,8 @@ class UserSeeder extends Seeder {
                 'email' => 'ayla@winkle.app',
                 'password' => Hash::make('password'),
                 'master_password' => Hash::make('password'),
-                'status_id' => 2
+                'status_id' => 2,
+                'admin' => false
             ],
             [
                 'id' => 3,
@@ -63,7 +65,8 @@ class UserSeeder extends Seeder {
                 'email' => 'lauro@winkle.app',
                 'password' => Hash::make('password'),
                 'master_password' => Hash::make('password'),
-                'status_id' => 2
+                'status_id' => 2,
+                'admin' => false
             ],
             [
                 'id' => 4,
@@ -71,7 +74,8 @@ class UserSeeder extends Seeder {
                 'email' => 'renan@winkle.app',
                 'password' => Hash::make('password'),
                 'master_password' => Hash::make('password'),
-                'status_id' => 2
+                'status_id' => 2,
+                'admin' => false
             ],
             [
                 'id' => 5,
@@ -79,7 +83,8 @@ class UserSeeder extends Seeder {
                 'email' => 'victor@winkle.app',
                 'password' => Hash::make('password'),
                 'master_password' => Hash::make('password'),
-                'status_id' => 2
+                'status_id' => 2,
+                'admin' => false
             ],
             [
                 'id' => 6,
@@ -87,7 +92,8 @@ class UserSeeder extends Seeder {
                 'email' => 'lais@winkle.app',
                 'password' => Hash::make('password'),
                 'master_password' => Hash::make('password'),
-                'status_id' => 2
+                'status_id' => 2,
+                'admin' => false
             ]
         ]);
 

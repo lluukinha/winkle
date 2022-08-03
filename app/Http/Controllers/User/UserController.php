@@ -18,6 +18,7 @@ use App\Exceptions\User\UserHasEncryptedDataException;
 use App\Exceptions\User\UserHasInvalidTokenException;
 use App\Exceptions\User\UserHasResetPasswordInProgressException;
 use App\Exceptions\User\UserInvalidPasswordException;
+use App\Exceptions\User\UserNotAllowedException;
 use App\Exceptions\User\UserNotFoundException;
 use App\Exceptions\User\UserOldPasswordIsIncorrectException;
 use App\Exceptions\User\UserPasswordDidNotChangeException;
@@ -255,6 +256,16 @@ class UserController extends Controller
             throw Http422::makeForField('password', 'password-incorrect');
         } catch (UserHasEncryptedDataException $e) {
             throw Http422::makeForField('master-password', 'has-encrypted-data');
+        }
+    }
+
+    public function list() {
+        try {
+            $repository = new UserRepository();
+            $users = $repository->listAllUsers();
+            return UserResource::collection($users);
+        } catch (UserNotAllowedException $e) {
+            throw Http422::makeForField('user', 'user-not-allowed');
         }
     }
 }

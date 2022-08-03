@@ -5,13 +5,14 @@ namespace App\Http\Repositories\User;
 use App\Exceptions\User\UserEmailDoesNotMatchException;
 use App\Exceptions\User\UserHasEncryptedDataException;
 use App\Exceptions\User\UserInvalidPasswordException;
+use App\Exceptions\User\UserNotAllowedException;
 use App\Exceptions\User\UserNotFoundException;
 use App\Exceptions\User\UserOldPasswordIsIncorrectException;
 use App\Exceptions\User\UserPasswordDidNotChangeException;
 use App\Exceptions\User\UserPasswordDoesNotMatchException;
 
 use App\Models\User;
-
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -88,5 +89,17 @@ class UserRepository {
         $user->master_password = Hash::make($newMasterPassword);
         $user->save();
         return $user;
+    }
+
+    public function listAllUsers() : Collection {
+
+        $user = $this->getLoggedInUser();
+
+        if (!$user->isAdmin()) {
+            throw new UserNotAllowedException();
+        }
+
+        $users = User::all();
+        return $users;
     }
 }

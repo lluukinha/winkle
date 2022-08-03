@@ -63,5 +63,7 @@ Route::middleware('auth')->group(function($router) {
         Route::put('/email', [UserController::class, 'updateEmail']);
         Route::put('/password', [UserController::class, 'updatePassword']);
         Route::put('/masterPassword', [UserController::class, 'updateMasterPassword']);
+
+        Route::get('/list', [UserController::class, 'list']);
     });
 });

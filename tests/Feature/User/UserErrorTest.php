@@ -175,4 +175,16 @@ class UserErrorTest extends TestCase
                 ]
             ]);
     }
+
+    public function testUserCanNotListAllUsers() {
+        $user = User::factory()->create([ "admin" => false ]);
+        $response = $this->actingAs($user)->getJson("/api/user/list");
+        $response
+            ->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    [ "title" => "user-not-allowed" ],
+                ]
+            ]);
+    }
 }

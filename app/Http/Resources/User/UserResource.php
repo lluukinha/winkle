@@ -25,6 +25,7 @@ class UserResource extends JsonResource
             'expirationDate' => $this->expirationDate(),
             'lastUpdate' => $this->updated_at,
             'createdAt' => $this->created_at,
+            'admin' => (bool) $this->admin
         ];
     }
 }

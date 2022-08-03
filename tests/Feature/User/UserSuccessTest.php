@@ -92,4 +92,22 @@ class UserSuccessTest extends TestCase
                 ]
             ]);
     }
+
+    public function testListAllUsers() {
+        $user = User::factory()->create([ 'admin' => true ]);
+        $user2 = User::factory()->create();
+        $user3 = User::factory()->create([ 'admin' => true ]);
+
+        $response = $this->actingAs($user)->getJson("/api/user/list");
+
+        $response
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    [ 'type' => 'users', 'id' => $user->id ],
+                    [ 'type' => 'users', 'id' => $user2->id ],
+                    [ 'type' => 'users', 'id' => $user3->id ]
+                ]
+            ]);
+    }
 }

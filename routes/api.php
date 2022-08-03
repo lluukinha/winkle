@@ -58,12 +58,13 @@ Route::middleware('auth')->group(function($router) {
     });
 
     Route::group(['prefix' => 'user'], function($router) {
+        Route::get('/list', [UserController::class, 'list']);
+        Route::post('/', [UserController::class, 'create']);
         Route::get('/', [UserController::class, 'show']);
         // Route::put('/', [UserController::class, 'update']);
         Route::put('/email', [UserController::class, 'updateEmail']);
         Route::put('/password', [UserController::class, 'updatePassword']);
         Route::put('/masterPassword', [UserController::class, 'updateMasterPassword']);
-
-        Route::get('/list', [UserController::class, 'list']);
+        Route::delete('/{id}', [UserController::class, 'delete']);
     });
 });

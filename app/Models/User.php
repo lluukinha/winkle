@@ -102,7 +102,7 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Folder::class);
     }
 
-    public function canUpdateMasterPassword() {
+    public function hasEncryptedData() {
         $passwordsCount = $this->passwords()
             ->where(function ($query) {
                 return $query
@@ -111,7 +111,7 @@ class User extends Authenticatable implements JWTSubject
             })
             ->count();
 
-        return $passwordsCount == 0;
+        return $passwordsCount > 0;
     }
 
     public function isAdmin() {

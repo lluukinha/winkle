@@ -13,6 +13,8 @@ use App\Http\Requests\User\UpdateUserPasswordRequest;
 
 use App\Exceptions\ApiExceptions\Http404;
 use App\Exceptions\ApiExceptions\Http422;
+use App\Exceptions\Plan\PlanNotFoundException;
+use App\Exceptions\User\UserAlreadyExistsException;
 use App\Exceptions\User\UserEmailDoesNotMatchException;
 use App\Exceptions\User\UserHasEncryptedDataException;
 use App\Exceptions\User\UserHasInvalidTokenException;
@@ -24,6 +26,7 @@ use App\Exceptions\User\UserOldPasswordIsIncorrectException;
 use App\Exceptions\User\UserPasswordDidNotChangeException;
 use App\Exceptions\User\UserPasswordDoesNotMatchException;
 use App\Http\Repositories\User\UserRepository;
+use App\Http\Requests\User\CreateUserRequest;
 use App\Http\Requests\User\FinishRegistrationRequest;
 use App\Http\Requests\User\RedefineUserPasswordRequest;
 use App\Http\Requests\User\VerifyRegistrationRequest;
@@ -266,6 +269,41 @@ class UserController extends Controller
             return UserResource::collection($users);
         } catch (UserNotAllowedException $e) {
             throw Http422::makeForField('user', 'user-not-allowed');
+        }
+    }
+
+    public function create(CreateUserRequest $request) {
+        try {
+            $attributes = $request->validated();
+            $repository = new UserRepository();
+            $user = $repository->createUser(
+                $attributes['name'],
+                $attributes['email'],
+                $attributes['plan'],
+                $attributes['admin']
+            );
+
+            return new UserResource($user);
+        } catch (UserNotAllowedException $e) {
+            throw Http422::makeForField('user', 'user-not-allowed');
+        } catch (UserAlreadyExistsException $e) {
+            throw Http422::makeForField('user', 'user-already-exists');
+        } catch (PlanNotFoundException $e) {
+            throw Http422::makeForField('plan', 'plan-not-found');
+        }
+    }
+
+
+    public function delete(int $userId) {
+        try {
+            $repository = new UserRepository();
+            return $repository->removeUser($userId);
+        } catch (UserNotAllowedException $e) {
+            throw Http422::makeForField('user', 'user-not-allowed');
+        } catch (UserNotFoundException $e) {
+            throw Http404::makeForField('user', 'user-not-found');
+        } catch (UserHasEncryptedDataException $e) {
+            throw Http422::makeForField('user', 'has-encrypted-data');
         }
     }
 }

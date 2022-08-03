@@ -20,7 +20,7 @@ class UserResource extends JsonResource
             'name' => (string) $this->name,
             'email' => (string) $this->email,
             'emailVerified' => (bool) !is_null($this->email_verified_at),
-            'canUpdateMasterPassword' => (bool) $this->canUpdateMasterPassword(),
+            'canUpdateMasterPassword' => (bool) !$this->hasEncryptedData(),
             'planName' => $this->currentPlan() ? $this->currentPlan()->name : '',
             'expirationDate' => $this->expirationDate(),
             'lastUpdate' => $this->updated_at,

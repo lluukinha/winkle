@@ -98,6 +98,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Password::class);
     }
 
+    public function notes() {
+        return $this->hasMany(Note::class);
+    }
+
     public function folders() {
         return $this->hasMany(Folder::class);
     }

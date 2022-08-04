@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Folder\FolderController;
+use App\Http\Controllers\Note\NoteController;
 use App\Http\Controllers\Password\PasswordController;
 use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\User\UserController;
@@ -55,6 +56,13 @@ Route::middleware('auth')->group(function($router) {
         Route::put('/{id}/folder/{folderId}', [PasswordController::class, 'updateFolder']);
         Route::put('/{id}/removeFolder', [PasswordController::class, 'removeFolder']);
         Route::delete('/{id}', [PasswordController::class, 'delete']);
+    });
+
+    Route::group(['prefix' => 'notes'], function($router) {
+        Route::get('/', [NoteController::class, 'list']);
+        Route::post('/', [NoteController::class, 'create']);
+        Route::put('/{id}', [NoteController::class, 'update']);
+        Route::delete('/{id}', [NoteController::class, 'delete']);
     });
 
     Route::group(['prefix' => 'user'], function($router) {

@@ -25,13 +25,13 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login', 'getPasswordsFromExtension']]);
     }
 
-    public function getPasswordsFromExtension(GetPasswordsFromExtensionRequest $request) {
+    public function getPasswordsFromExtension(GetPasswordsFromExtensionRequest $request)
+    {
 
         $attributes = $request->validated();
 
         $user = User::where(['email' => $attributes['email'], 'status_id' => 2])
             ->whereNotNull('password')
-            ->whereNotNull('master_password')
             ->first();
 
         if (!$user) throw Http404::makeForField('user', 'not-found');
@@ -43,10 +43,6 @@ class AuthController extends Controller
 
         if (!Hash::check($attributes['password'], $user->password)) {
             throw Http422::makeForField('password', 'incorrect');
-        }
-
-        if (!Hash::check($attributes['masterPassword'], $user->master_password)) {
-            throw Http422::makeForField('master-password', 'incorrect');
         }
 
         $passwords = $user->passwords()->whereNotNull('password')->get();
@@ -62,7 +58,6 @@ class AuthController extends Controller
     {
         $user = User::where(['email' => $request->email, 'status_id' => 2])
             ->whereNotNull('password')
-            ->whereNotNull('master_password')
             ->first();
 
         if (!$user) {
@@ -77,7 +72,7 @@ class AuthController extends Controller
 
         $credentials = request(['email', 'password']);
 
-        if (! $token = auth()->attempt($credentials)) {
+        if (!$token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -86,8 +81,8 @@ class AuthController extends Controller
 
     public function checkMasterPassword()
     {
-        $masterPassword = request('master');
-        $userMasterPassword = Auth::user()->master_password;
+        $masterPassword = request('password');
+        $userMasterPassword = Auth::user()->password;
         $response = Hash::check($masterPassword, $userMasterPassword);
         return response()->json($response);
     }
@@ -137,8 +132,7 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => (auth()->factory()->getTTL() * 60) * $daysToExpire,
-            'user' => auth()->user()->name,
-            'shuffled' => auth()->user()->master_password
+            'user' => auth()->user()->name
         ]);
     }
 }

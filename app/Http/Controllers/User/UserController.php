@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Http\Resources\User\UserResource;
 use App\Http\Requests\User\UpdateUserEmailRequest;
-use App\Http\Requests\User\UpdateUserMasterPasswordRequest;
 use App\Http\Requests\User\UpdateUserPasswordRequest;
 
 use App\Exceptions\ApiExceptions\Http404;
@@ -41,7 +40,8 @@ use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
-    public function verifyRegistration(VerifyRegistrationRequest $request) {
+    public function verifyRegistration(VerifyRegistrationRequest $request)
+    {
         try {
             $attributes = $request->validated();
 
@@ -66,7 +66,8 @@ class UserController extends Controller
         }
     }
 
-    public function finishRegistration(FinishRegistrationRequest $request) {
+    public function finishRegistration(FinishRegistrationRequest $request)
+    {
         try {
             $attributes = $request->validated();
 
@@ -109,7 +110,8 @@ class UserController extends Controller
         }
     }
 
-    public function resetPassword(RedefineUserPasswordRequest $request) {
+    public function resetPassword(RedefineUserPasswordRequest $request)
+    {
         try {
             $attributes = $request->validated();
 
@@ -168,7 +170,7 @@ class UserController extends Controller
             if (!$user) throw new UserNotFoundException();
 
             $hasReset = DB::table('password_resets')
-                ->where([ 'email' => $user->email ])
+                ->where(['email' => $user->email])
                 ->where('expires_at', '>', Carbon::now())
                 ->exists();
 
@@ -178,10 +180,10 @@ class UserController extends Controller
 
             $token = Str::random(10);
             DB::table('password_resets')->insert([
-              'email' => $request->email,
-              'token' => $token,
-              'created_at' => Carbon::now(),
-              'expires_at' => Carbon::now()->addDay(1)
+                'email' => $request->email,
+                'token' => $token,
+                'created_at' => Carbon::now(),
+                'expires_at' => Carbon::now()->addDay(1)
             ]);
 
             Mail::to($email)->send(new SendForgotPasswordMail($user, $token));
@@ -193,12 +195,14 @@ class UserController extends Controller
         }
     }
 
-    public function show() {
+    public function show()
+    {
         $user = Auth::user();
         return new UserResource($user);
     }
 
-    public function updateEmail(UpdateUserEmailRequest $request) {
+    public function updateEmail(UpdateUserEmailRequest $request)
+    {
         try {
             $attributes = $request->validated();
             $repository = new UserRepository();
@@ -217,7 +221,8 @@ class UserController extends Controller
         }
     }
 
-    public function updatePassword(UpdateUserPasswordRequest $request) {
+    public function updatePassword(UpdateUserPasswordRequest $request)
+    {
         try {
             $attributes = $request->validated();
             $repository = new UserRepository();
@@ -238,31 +243,8 @@ class UserController extends Controller
         }
     }
 
-    public function updateMasterPassword(UpdateUserMasterPasswordRequest $request) {
-        try {
-            $attributes = $request->validated();
-            $repository = new UserRepository();
-            $user = $repository->updateMasterPassword(
-                $attributes["password"],
-                $attributes["oldMasterPassword"],
-                $attributes["newMasterPassword"],
-                $attributes["confirmNewMasterPassword"]
-            );
-            return new UserResource($user);
-        } catch (UserNotFoundException $e) {
-            throw Http404::makeForField('user', 'not-found');
-        } catch (UserOldPasswordIsIncorrectException $e) {
-            throw Http422::makeForField('oldPassword', 'master-password-incorrect');
-        } catch (UserPasswordDidNotChangeException $e) {
-            throw Http422::makeForField('master-password', 'password-is-equal');
-        } catch (UserInvalidPasswordException $e) {
-            throw Http422::makeForField('password', 'password-incorrect');
-        } catch (UserHasEncryptedDataException $e) {
-            throw Http422::makeForField('master-password', 'has-encrypted-data');
-        }
-    }
-
-    public function list() {
+    public function list()
+    {
         try {
             $repository = new UserRepository();
             $users = $repository->listAllUsers();
@@ -272,7 +254,8 @@ class UserController extends Controller
         }
     }
 
-    public function create(CreateUserRequest $request) {
+    public function create(CreateUserRequest $request)
+    {
         try {
             $attributes = $request->validated();
             $repository = new UserRepository();
@@ -294,7 +277,8 @@ class UserController extends Controller
     }
 
 
-    public function delete(int $userId) {
+    public function delete(int $userId)
+    {
         try {
             $repository = new UserRepository();
             return $repository->removeUser($userId);

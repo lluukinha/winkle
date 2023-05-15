@@ -19,20 +19,24 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
-class UserRepository {
+class UserRepository
+{
 
-    private function getLoggedInUser() : User {
+    private function getLoggedInUser(): User
+    {
         $userId = Auth::user()->id;
         $user = User::find($userId);
         if (!$user) throw new UserNotFoundException();
         return $user;
     }
 
-    public function updateEmail(string $email, string $confirmEmail, string $password) : User {
+    public function updateEmail(string $email, string $confirmEmail, string $password): User
+    {
         $user = $this->getLoggedInUser();
 
         if (!Hash::check($password, $user->password)) {
@@ -48,7 +52,8 @@ class UserRepository {
         return $user;
     }
 
-    public function updatePassword(string $password, string $newPassword, string $confirmNewPassword) : User {
+    public function updatePassword(string $password, string $newPassword, string $confirmNewPassword): User
+    {
         $user = $this->getLoggedInUser();
 
         if (!Hash::check($password, $user->password)) {
@@ -64,6 +69,7 @@ class UserRepository {
         }
 
         $user->password = Hash::make($newPassword);
+
         $user->save();
 
         return $user;
@@ -73,7 +79,7 @@ class UserRepository {
         string $password,
         string $oldMasterPassword,
         string $newMasterPassword
-    ) : User {
+    ): User {
 
         $user = $this->getLoggedInUser();
 
@@ -98,7 +104,8 @@ class UserRepository {
         return $user;
     }
 
-    public function listAllUsers() : Collection {
+    public function listAllUsers(): Collection
+    {
 
         $user = $this->getLoggedInUser();
 
@@ -110,7 +117,8 @@ class UserRepository {
         return $users;
     }
 
-    public function removeUser(int $userId) {
+    public function removeUser(int $userId)
+    {
         $user = $this->getLoggedInUser();
 
         if (!$user->isAdmin() || $user->id == $userId) {
@@ -134,7 +142,8 @@ class UserRepository {
         return true;
     }
 
-    public function createUser(string $name, string $email, int $planId, bool $admin) : User {
+    public function createUser(string $name, string $email, int $planId, bool $admin): User
+    {
         $user = $this->getLoggedInUser();
 
         if (!$user->isAdmin()) {
@@ -164,7 +173,7 @@ class UserRepository {
 
         $sale = new Sale();
         $sale->user_id = $newUser->id;
-        $sale->code = "manual_". $email;
+        $sale->code = "manual_" . $email;
         $sale->plan_id = $plan->id;
         $sale->value_total = 0;
         $sale->final_value = 0;
